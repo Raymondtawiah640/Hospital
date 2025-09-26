@@ -1,11 +1,12 @@
 <div class="min-h-screen flex flex-col">
-  <!-- Navbar only when logged in -->
-  <app-navbar *ngIf="showLayout()"></app-navbar>
+  <!-- Navbar always visible -->
+  <app-navbar></app-navbar>
 
+  <!-- Main content -->
   <main class="flex-1">
     <router-outlet></router-outlet>
   </main>
 
-  <!-- Footer only when logged in -->
-  <app-footer *ngIf="showLayout()"></app-footer>
+  <!-- Footer always visible -->
+  <app-footer></app-footer>
 </div>
