@@ -1,1 +1,134 @@
-<p>add-doctor works!</p>
+<!-- add-doctor.component.html -->
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+  <h2 class="text-2xl font-bold text-blue-900 mb-6">Add New Doctor</h2>
+
+  <form>
+    <!-- Doctor Identification -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Doctor ID -->
+      <div>
+        <label for="doctorId" class="block text-gray-700 font-semibold mb-2">Doctor ID</label>
+        <input id="doctorId" type="text" placeholder="DOC-001"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Ghana Card Number -->
+      <div>
+        <label for="ghanaCard" class="block text-gray-700 font-semibold mb-2">Ghana Card Number</label>
+        <input id="ghanaCard" type="text" placeholder="GHA-XXXXXXXXX-X"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Personal Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- First Name -->
+      <div>
+        <label for="firstName" class="block text-gray-700 font-semibold mb-2">First Name</label>
+        <input id="firstName" type="text" placeholder="Enter first name"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Last Name -->
+      <div>
+        <label for="lastName" class="block text-gray-700 font-semibold mb-2">Last Name</label>
+        <input id="lastName" type="text" placeholder="Enter last name"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Date of Birth -->
+      <div>
+        <label for="dob" class="block text-gray-700 font-semibold mb-2">Date of Birth</label>
+        <input id="dob" type="date"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Gender -->
+      <div>
+        <label for="gender" class="block text-gray-700 font-semibold mb-2">Gender</label>
+        <select id="gender"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <option value="">Select gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Professional Information -->
+    <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Professional Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Specialization -->
+      <div>
+        <label for="specialization" class="block text-gray-700 font-semibold mb-2">Specialization</label>
+        <input id="specialization" type="text" placeholder="e.g. Cardiology, Pediatrics"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Department -->
+      <div>
+        <label for="department" class="block text-gray-700 font-semibold mb-2">Department</label>
+        <select id="department"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          <option value="">Select department</option>
+          <option>General Medicine</option>
+          <option>Cardiology</option>
+          <option>Pediatrics</option>
+          <option>Emergency</option>
+          <option>Laboratory</option>
+          <option>Pharmacy</option>
+          <option>Surgery</option>
+        </select>
+      </div>
+
+      <!-- Years of Experience -->
+      <div>
+        <label for="experience" class="block text-gray-700 font-semibold mb-2">Years of Experience</label>
+        <input id="experience" type="number" min="0" placeholder="e.g. 10"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- License Number -->
+      <div>
+        <label for="license" class="block text-gray-700 font-semibold mb-2">Medical License Number</label>
+        <input id="license" type="text" placeholder="MLN-123456"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+    </div>
+
+    <!-- Contact Information -->
+    <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Contact Information</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Phone -->
+      <div>
+        <label for="phone" class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+        <input id="phone" type="tel" placeholder="+233 24 123 4567"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
+        <input id="email" type="email" placeholder="doctor@example.com"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      </div>
+
+      <!-- Address -->
+      <div class="md:col-span-2">
+        <label for="address" class="block text-gray-700 font-semibold mb-2">Residential Address</label>
+        <textarea id="address" rows="2" placeholder="Enter address"
+          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+      </div>
+    </div>
+
+    <!-- Submit -->
+    <div class="mt-8 flex justify-end">
+      <button type="submit"
+        class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+        Save Doctor
+      </button>
+    </div>
+  </form>
+</div>
