@@ -1,0 +1,179 @@
+<!-- navbar.component.html -->
+<nav class="bg-blue-700 text-white shadow-md">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16 items-center flex-wrap">
+      
+      <!-- Logo -->
+      <div class="flex items-center">
+        <img src="logo.png" alt="Hospital Logo" class="h-10 w-10 mr-2" />
+      </div>
+
+     <!-- Desktop Navigation -->
+<div class="hidden md:flex flex-wrap space-x-6 items-center">
+  <a href="#" class="hover:text-red-400">Dashboard</a>
+
+  <!-- Patients Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Patients <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute left-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50"
+    >
+      <a routerLink="/all-patients" class="block px-4 py-2 hover:bg-green-100">All Patients</a>
+      <a routerLink="/add-patient" class="block px-4 py-2 hover:bg-green-100">Add Patient</a>
+      <a routerLink="/patient-records" class="block px-4 py-2 hover:bg-green-100">Patient Records</a>
+    </div>
+  </div>
+
+  <!-- Doctors Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Doctors <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute left-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50"
+    >
+      <a routerLink="/all-doctors" class="block px-4 py-2 hover:bg-green-100">All Doctors</a>
+      <a routerLink="/add-doctor" class="block px-4 py-2 hover:bg-green-100">Add Doctor</a>
+      <a routerLink="/schedules" class="block px-4 py-2 hover:bg-green-100">Schedules</a>
+    </div>
+  </div>
+
+  <!-- Appointments Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Appointments <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute left-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50"
+    >
+      <a routerLink="/all-appointments" class="block px-4 py-2 hover:bg-green-100">All Appointments</a>
+      <a routerLink="/book-appointment" class="block px-4 py-2 hover:bg-green-100">Book Appointment</a>
+      <a routerLink="/appointment-history" class="block px-4 py-2 hover:bg-green-100">Appointment History</a>
+    </div>
+  </div>
+
+  <!-- Laboratory & Pharmacy Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Lab & Pharmacy <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute left-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50"
+    >
+      <a routerLink="/laboratory-tests" class="block px-4 py-2 hover:bg-green-100">Laboratory Tests</a>
+      <a routerLink="/test-results" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
+      <a routerLink="/pharmacy-stock" class="block px-4 py-2 hover:bg-green-100">Pharmacy Stock</a>
+      <a routerLink="/prescriptions" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
+    </div>
+  </div>
+
+  <!-- Billing & Records Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Billing & Records <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute left-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-52 z-50"
+    >
+      <a routerLink="/billing" class="block px-4 py-2 hover:bg-green-100">Billing</a>
+      <a routerLink="/invoices" class="block px-4 py-2 hover:bg-green-100">Invoices</a>
+      <a routerLink="/medical-records" class="block px-4 py-2 hover:bg-green-100">Medical Records</a>
+    </div>
+  </div>
+
+  <!-- Departments Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Departments <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute left-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50"
+    >
+      <a routerLink="/general-department" class="block px-4 py-2 hover:bg-green-100">General Department</a>
+      <a routerLink="/cardiology" class="block px-4 py-2 hover:bg-green-100">Cardiology</a>
+      <a routerLink="/pediatrics" class="block px-4 py-2 hover:bg-green-100">Pediatrics</a>
+      <a routerLink="/emergency" class="block px-4 py-2 hover:bg-green-100">Emergency</a>
+    </div>
+  </div>
+
+  <!-- Reports Dropdown -->
+  <div class="relative group">
+    <button class="hover:text-green-400 flex items-center">
+      Reports <span class="ml-1">▾</span>
+    </button>
+    <div
+      class="absolute right-0 hidden group-hover:flex hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50"
+    >
+      <a routerLink="/daily-reports" class="block px-4 py-2 hover:bg-green-100">Daily Reports</a>
+      <a routerLink="/monthly-reports" class="block px-4 py-2 hover:bg-green-100">Monthly Reports</a>
+      <a routerLink="/annual-reports" class="block px-4 py-2 hover:bg-green-100">Annual Reports</a>
+    </div>
+  </div>
+
+  <!-- Login Icon -->
+  <div class="flex items-center ml-6">
+    <a routerLink="/login" class="flex items-center space-x-2 hover:text-green-400">
+      <!-- Heroicon: User -->
+      <svg xmlns="http://www.w3.org/2000/svg" 
+           class="h-6 w-6" 
+           fill="none" 
+           viewBox="0 0 24 24" 
+           stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>Login</span>
+    </a>
+  </div>
+</div>
+
+    <!-- Mobile Menu Button -->
+<div class="md:hidden flex items-center">
+  <button (click)="toggleMenu()" class="focus:outline-none">
+    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Mobile Menu Links -->
+<div *ngIf="menuOpen" class="md:hidden bg-blue-700 text-white w-full absolute top-16 left-0 z-50 shadow-lg">
+  <a routerLink="/dashboard" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Dashboard</a>
+
+  <a routerLink="/all-patients" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Patients</a>
+  <a routerLink="/add-patient" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Add Patient</a>
+  <a routerLink="/patient-records" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Patient Records</a>
+
+  <a routerLink="/all-doctors" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Doctors</a>
+  <a routerLink="/add-doctor" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Add Doctor</a>
+  <a routerLink="/schedules" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Schedules</a>
+
+  <a routerLink="/all-appointments" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Appointments</a>
+  <a routerLink="/book-appointment" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Book Appointment</a>
+  <a routerLink="/appointment-history" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Appointment History</a>
+
+  <a routerLink="/laboratory-tests" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Laboratory Tests</a>
+  <a routerLink="/test-results" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Test Results</a>
+  <a routerLink="/pharmacy-stock" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pharmacy Stock</a>
+  <a routerLink="/prescriptions" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Prescriptions</a>
+
+  <a routerLink="/billing" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Billing</a>
+  <a routerLink="/invoices" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Invoices</a>
+  <a routerLink="/medical-records" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Medical Records</a>
+
+  <a routerLink="/general-department" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">General Department</a>
+  <a routerLink="/cardiology" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Cardiology</a>
+  <a routerLink="/pediatrics" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pediatrics</a>
+  <a routerLink="/emergency" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Emergency</a>
+
+  <a routerLink="/daily-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Daily Reports</a>
+  <a routerLink="/monthly-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Monthly Reports</a>
+  <a routerLink="/annual-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Annual Reports</a>
+</div>
+
+
+    </div>
+  </div>
+</nav>
