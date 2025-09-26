@@ -100,25 +100,22 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Select only the direct children of the header (the slides)
-    const slides = document.querySelectorAll('header > div');
+    const slides = document.querySelectorAll("header > div"); // select direct children only
     let current = 0;
 
     function showSlide(index) {
       slides.forEach((slide, i) => {
-        slide.classList.toggle('hidden', i !== index);
+        slide.classList.toggle("hidden", i !== index);
       });
     }
 
-    // Show the first slide initially
+    // Show first slide
     showSlide(current);
 
-    // Cycle through slides every 4 seconds
+    // Cycle every 4 seconds
     setInterval(() => {
       current = (current + 1) % slides.length;
       showSlide(current);
     }, 4000);
   });
 </script>
-
-
