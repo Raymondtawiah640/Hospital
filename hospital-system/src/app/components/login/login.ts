@@ -1,49 +1,60 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Auth } from '../../services/auth';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth'; // import your AuthService
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]  // <-- Add this
+  imports: [CommonModule, FormsModule]
 })
 export class Login {
   staff_id: string = '';
   department: string = '';
   password: string = '';
   message: string = '';
+  showPassword: boolean = false;
 
-  private apiUrl = 'http://207.180.192.46/presbyterian-hospital/includes/login.php';
+  constructor(private router: Router, private auth: AuthService) {}
 
-  constructor(private http: HttpClient, private router: Router, private auth: Auth) {}
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   login(): void {
+    this.message = '';
+
+    // Strong password regex
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/;
+
+    // Check required fields
     if (!this.staff_id || !this.department || !this.password) {
       this.message = '⚠️ All fields are required';
       return;
     }
 
-    const payload = { staff_id: this.staff_id, department: this.department, password: this.password };
+    // Check password strength
+    if (!passwordRegex.test(this.password)) {
+      this.message =
+        '⚠️ Password must be 8-20 chars, include uppercase, lowercase, number, and special char';
+      return;
+    }
 
-    this.http.post<any>(this.apiUrl, payload).subscribe({
+    // Call AuthService with all 3 values
+    this.auth.login(this.staff_id, this.department, this.password).subscribe({
       next: (res) => {
-        if (res.success) {
-          localStorage.setItem('staff', JSON.stringify({
-            staff_id: this.staff_id,
-            full_name: res.staff?.full_name ?? '',
-            department: this.department
-          }));
-          this.router.navigate(['/dashboard']); // redirect to dashboard
+        if (res.success && res.staff) {
+          this.router.navigate(['/dashboard']);
         } else {
-          this.message = res.message; // show error from PHP
+          this.message = res.message || '❌ Invalid credentials';
         }
       },
-      error: () => {
+      error: (err) => {
+        console.error('Login error:', err);
         this.message = '❌ Server error. Please try again later';
       }
     });

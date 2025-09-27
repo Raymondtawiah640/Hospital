@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
-import { Auth } from '../../services/auth';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-navbar',
@@ -12,17 +12,58 @@ import { Auth } from '../../services/auth';
 })
 export class Navbar {
   menuOpen = false;
+  openDropdown: string | null = null; // which dropdown is open
+  dropdownTimeout: any; // timer to delay closing
 
-  constructor(public auth: Auth, private router: Router) {}
+  constructor(public auth: AuthService, private router: Router) {}
+  
+  // Toggle mobile menu open/close
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
 
-  toggleMenu(): void { this.menuOpen = !this.menuOpen; }
-  closeMenu(): void { this.menuOpen = false; }
+  // Close mobile menu
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
 
-  get isLoggedIn(): boolean { return this.auth.loggedIn(); }
-  get staffName(): string { return this.auth.getStaff()?.full_name || ''; }
+  // Open dropdown immediately
+  openDropdownMenu(name: string): void {
+    clearTimeout(this.dropdownTimeout);
+    this.openDropdown = name;
+  }
 
+  // Close dropdown with small delay (to allow cursor to move over menu)
+  closeDropdownMenu(): void {
+    this.dropdownTimeout = setTimeout(() => {
+      this.openDropdown = null;
+    }, 200); // 200ms delay
+  }
+
+  // Toggle dropdown when clicking (optional for desktop)
+  toggleDropdown(name: string): void {
+    this.openDropdown = this.openDropdown === name ? null : name;
+  }
+
+  // Close both mobile menu and dropdowns
+  navigateAndClose(): void {
+    this.closeMenu();
+    this.openDropdown = null;
+  }
+
+  // Logout
   logout(): void {
     this.auth.logout();
     this.router.navigate(['/login']);
+    this.navigateAndClose();
+  }
+
+  // Auth helpers
+  get isLoggedIn(): boolean {
+    return this.auth.loggedIn();
+  }
+
+  get staffName(): string {
+    return this.auth.getStaff()?.full_name || '';
   }
 }

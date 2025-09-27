@@ -1,1 +1,90 @@
-<p>invoices works!</p>
+<div class="min-h-screen bg-gray-100 p-6 space-y-8">
+
+  <!-- Page Header -->
+  <div class="max-w-7xl mx-auto mb-6">
+    <h1 class="text-3xl font-bold text-blue-700">Invoices</h1>
+    <p class="text-gray-600 mt-1">
+      Manage all hospital invoices, view payment status, and track pending and completed transactions.
+    </p>
+  </div>
+
+  <!-- Invoice Summary Cards -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-500">
+      <h2 class="text-gray-500 text-sm font-medium">Total Invoices</h2>
+      <p class="text-3xl font-bold text-blue-600">450</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-green-500">
+      <h2 class="text-gray-500 text-sm font-medium">Paid Invoices</h2>
+      <p class="text-3xl font-bold text-green-600">300</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-yellow-500">
+      <h2 class="text-gray-500 text-sm font-medium">Pending Invoices</h2>
+      <p class="text-3xl font-bold text-yellow-600">120</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-red-500">
+      <h2 class="text-gray-500 text-sm font-medium">Overdue Invoices</h2>
+      <p class="text-3xl font-bold text-red-600">30</p>
+    </div>
+  </div>
+
+  <!-- Search & Add Invoice -->
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 gap-4">
+    <div class="w-full md:w-1/2">
+      <input type="text" placeholder="Search invoices..."
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+    </div>
+    <div>
+      <button
+        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-300">
+        + Add New Invoice
+      </button>
+    </div>
+  </div>
+
+  <!-- Invoices Table -->
+  <div class="max-w-7xl mx-auto overflow-x-auto">
+    <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+      <thead class="bg-blue-700 text-white">
+        <tr>
+          <th class="px-4 py-2 text-left">Invoice #</th>
+          <th class="px-4 py-2 text-left">Patient</th>
+          <th class="px-4 py-2 text-left">Doctor</th>
+          <th class="px-4 py-2 text-left">Amount</th>
+          <th class="px-4 py-2 text-left">Date</th>
+          <th class="px-4 py-2 text-left">Status</th>
+          <th class="px-4 py-2 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <!-- Example row -->
+        <tr>
+          <td class="px-4 py-2">INV-001</td>
+          <td class="px-4 py-2">John Doe</td>
+          <td class="px-4 py-2">Dr. Smith</td>
+          <td class="px-4 py-2">$200.00</td>
+          <td class="px-4 py-2">2025-09-25</td>
+          <td class="px-4 py-2">
+            <span class="text-green-600 font-semibold">Paid</span>
+          </td>
+          <td class="px-4 py-2 text-center">
+            <button class="text-blue-600 hover:text-blue-800 mx-1">View</button>
+            <button class="text-yellow-600 hover:text-yellow-800 mx-1">Edit</button>
+            <button class="text-red-600 hover:text-red-800 mx-1">Delete</button>
+          </td>
+        </tr>
+        <!-- No invoices row -->
+        <tr>
+          <td colspan="7" class="text-center py-4 text-gray-500">No invoices found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="max-w-7xl mx-auto mt-6 flex justify-end">
+    <button class="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300">Prev</button>
+    <button class="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300 ml-1">Next</button>
+  </div>
+
+</div>

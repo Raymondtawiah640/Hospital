@@ -1,4 +1,4 @@
-<nav class="bg-blue-700 text-white shadow-md">
+<nav class="bg-blue-700 text-white shadow-md relative z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16 items-center flex-wrap">
       
@@ -11,115 +11,106 @@
 
       <!-- Desktop Navigation -->
       <div class="hidden md:flex flex-wrap space-x-6 items-center">
-        <a routerLink="/dashboard" class="hover:text-red-400">Dashboard</a>
+        <a routerLink="/dashboard" (click)="navigateAndClose()" class="hover:text-red-400">Dashboard</a>
 
         <!-- Patients Dropdown -->
-        <div class="relative group">
+        <div class="relative"
+             (mouseenter)="openDropdownMenu('patients')" 
+             (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Patients <span class="ml-1">▾</span>
           </button>
-          <div class="absolute left-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50">
-            <a routerLink="/all-patients" class="block px-4 py-2 hover:bg-green-100">All Patients</a>
-            <a routerLink="/add-patient" class="block px-4 py-2 hover:bg-green-100">Add Patient</a>
-            <a routerLink="/patient-records" class="block px-4 py-2 hover:bg-green-100">Patient Records</a>
+          <div *ngIf="openDropdown === 'patients'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50">
+            <a routerLink="/all-patients" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">All Patients</a>
+            <a routerLink="/add-patient" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Add Patient</a>
+            <a routerLink="/patient-records" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Patient Records</a>
           </div>
         </div>
 
         <!-- Doctors Dropdown -->
-        <div class="relative group">
+        <div class="relative"
+             (mouseenter)="openDropdownMenu('doctors')" 
+             (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Doctors <span class="ml-1">▾</span>
           </button>
-          <div class="absolute left-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50">
-            <a routerLink="/all-doctors" class="block px-4 py-2 hover:bg-green-100">All Doctors</a>
-            <a routerLink="/add-doctor" class="block px-4 py-2 hover:bg-green-100">Add Doctor</a>
-            <a routerLink="/schedules" class="block px-4 py-2 hover:bg-green-100">Schedules</a>
+          <div *ngIf="openDropdown === 'doctors'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50">
+            <a routerLink="/all-doctors" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">All Doctors</a>
+            <a routerLink="/add-doctor" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Add Doctor</a>
+            <a routerLink="/schedules" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Schedules</a>
           </div>
         </div>
 
         <!-- Appointments Dropdown -->
-        <div class="relative group">
+        <div class="relative" (mouseenter)="openDropdownMenu('appointments')" (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Appointments <span class="ml-1">▾</span>
           </button>
-          <div class="absolute left-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
-            <a routerLink="/all-appointments" class="block px-4 py-2 hover:bg-green-100">All Appointments</a>
-            <a routerLink="/book-appointment" class="block px-4 py-2 hover:bg-green-100">Book Appointment</a>
-            <a routerLink="/appointment-history" class="block px-4 py-2 hover:bg-green-100">Appointment History</a>
+          <div *ngIf="openDropdown === 'appointments'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
+            <a routerLink="/all-appointments" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">All Appointments</a>
+            <a routerLink="/book-appointment" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Book Appointment</a>
+            <a routerLink="/appointment-history" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Appointment History</a>
           </div>
         </div>
 
-        <!-- Lab & Pharmacy -->
-        <div class="relative group">
+        <!-- Lab & Pharmacy Dropdown -->
+        <div class="relative" (mouseenter)="openDropdownMenu('lab')" (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Lab & Pharmacy <span class="ml-1">▾</span>
           </button>
-          <div class="absolute left-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
-            <a routerLink="/laboratory-tests" class="block px-4 py-2 hover:bg-green-100">Laboratory Tests</a>
-            <a routerLink="/test-results" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
-            <a routerLink="/pharmacy-stock" class="block px-4 py-2 hover:bg-green-100">Pharmacy Stock</a>
-            <a routerLink="/prescriptions" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
+          <div *ngIf="openDropdown === 'lab'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
+            <a routerLink="/laboratory-tests" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Laboratory Tests</a>
+            <a routerLink="/test-results" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
+            <a routerLink="/pharmacy-stock" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Pharmacy Stock</a>
+            <a routerLink="/prescriptions" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
           </div>
         </div>
 
-        <!-- Billing -->
-        <div class="relative group">
+        <!-- Billing Dropdown -->
+        <div class="relative" (mouseenter)="openDropdownMenu('billing')" (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Billing & Records <span class="ml-1">▾</span>
           </button>
-          <div class="absolute left-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-52 z-50">
-            <a routerLink="/billing" class="block px-4 py-2 hover:bg-green-100">Billing</a>
-            <a routerLink="/invoices" class="block px-4 py-2 hover:bg-green-100">Invoices</a>
-            <a routerLink="/medical-records" class="block px-4 py-2 hover:bg-green-100">Medical Records</a>
+          <div *ngIf="openDropdown === 'billing'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-52 z-50">
+            <a routerLink="/billing" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Billing</a>
+            <a routerLink="/invoices" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Invoices</a>
+            <a routerLink="/medical-records" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Medical Records</a>
           </div>
         </div>
 
-        <!-- Departments -->
-        <div class="relative group">
+        <!-- Departments Dropdown -->
+        <div class="relative" (mouseenter)="openDropdownMenu('departments')" (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Departments <span class="ml-1">▾</span>
           </button>
-          <div class="absolute left-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50">
-            <a routerLink="/general-department" class="block px-4 py-2 hover:bg-green-100">General Department</a>
-            <a routerLink="/cardiology" class="block px-4 py-2 hover:bg-green-100">Cardiology</a>
-            <a routerLink="/pediatrics" class="block px-4 py-2 hover:bg-green-100">Pediatrics</a>
-            <a routerLink="/emergency" class="block px-4 py-2 hover:bg-green-100">Emergency</a>
+          <div *ngIf="openDropdown === 'departments'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-44 z-50">
+            <a routerLink="/general-department" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">General Department</a>
+            <a routerLink="/cardiology" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Cardiology</a>
+            <a routerLink="/pediatrics" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Pediatrics</a>
+            <a routerLink="/emergency" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Emergency</a>
           </div>
         </div>
 
-        <!-- Reports -->
-        <div class="relative group">
+        <!-- Reports Dropdown -->
+        <div class="relative" (mouseenter)="openDropdownMenu('reports')" (mouseleave)="closeDropdownMenu()">
           <button class="hover:text-green-400 flex items-center">
             Reports <span class="ml-1">▾</span>
           </button>
-          <div class="absolute right-0 hidden group-hover:flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
-            <a routerLink="/daily-reports" class="block px-4 py-2 hover:bg-green-100">Daily Reports</a>
-            <a routerLink="/monthly-reports" class="block px-4 py-2 hover:bg-green-100">Monthly Reports</a>
-            <a routerLink="/annual-reports" class="block px-4 py-2 hover:bg-green-100">Annual Reports</a>
+          <div *ngIf="openDropdown === 'reports'" class="absolute right-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
+            <a routerLink="/daily-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Daily Reports</a>
+            <a routerLink="/monthly-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Monthly Reports</a>
+            <a routerLink="/annual-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Annual Reports</a>
           </div>
         </div>
 
         <!-- Auth Section -->
         <div class="flex items-center ml-6">
-          <!-- If logged in -->
           <ng-container *ngIf="isLoggedIn; else guestLinks">
             <span class="mr-4">👋 {{ staffName }}</span>
-            <button (click)="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg">
-              Logout
-            </button>
+            <button (click)="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg">Logout</button>
           </ng-container>
-
-          <!-- If not logged in -->
           <ng-template #guestLinks>
-            <a routerLink="/login" class="flex items-center space-x-2 hover:text-green-400">
-              <svg xmlns="http://www.w3.org/2000/svg" 
-                   class="h-6 w-6" 
-                   fill="none" 
-                   viewBox="0 0 24 24" 
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+            <a routerLink="/login" (click)="navigateAndClose()" class="flex items-center space-x-2 hover:text-green-400">
               <span>Login</span>
             </a>
           </ng-template>
@@ -142,34 +133,27 @@
         <a routerLink="/all-patients" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Patients</a>
         <a routerLink="/add-patient" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Add Patient</a>
         <a routerLink="/patient-records" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Patient Records</a>
-
         <a routerLink="/all-doctors" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Doctors</a>
         <a routerLink="/add-doctor" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Add Doctor</a>
         <a routerLink="/schedules" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Schedules</a>
-
         <a routerLink="/all-appointments" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Appointments</a>
         <a routerLink="/book-appointment" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Book Appointment</a>
         <a routerLink="/appointment-history" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Appointment History</a>
-
         <a routerLink="/laboratory-tests" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Laboratory Tests</a>
         <a routerLink="/test-results" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Test Results</a>
         <a routerLink="/pharmacy-stock" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pharmacy Stock</a>
         <a routerLink="/prescriptions" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Prescriptions</a>
-
         <a routerLink="/billing" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Billing</a>
         <a routerLink="/invoices" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Invoices</a>
         <a routerLink="/medical-records" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Medical Records</a>
-
         <a routerLink="/general-department" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">General Department</a>
         <a routerLink="/cardiology" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Cardiology</a>
         <a routerLink="/pediatrics" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pediatrics</a>
         <a routerLink="/emergency" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Emergency</a>
-
         <a routerLink="/daily-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Daily Reports</a>
         <a routerLink="/monthly-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Monthly Reports</a>
         <a routerLink="/annual-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Annual Reports</a>
 
-        <!-- Auth Section for Mobile -->
         <ng-container *ngIf="isLoggedIn; else mobileGuest">
           <span class="block px-4 py-2">👋 {{ staffName }}</span>
           <button (click)="logout()" class="w-full text-left px-4 py-2 bg-red-600 hover:bg-red-700">

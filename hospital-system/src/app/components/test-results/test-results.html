@@ -1,1 +1,86 @@
-<p>test-results works!</p>
+<div class="min-h-screen bg-gray-100 p-6 space-y-8">
+
+  <!-- Page Header -->
+  <div class="max-w-7xl mx-auto mb-6">
+    <h1 class="text-3xl font-bold text-blue-700">Test Results</h1>
+    <p class="text-gray-600 mt-1">
+      Review and manage laboratory test results for patients. Track status, analyze outcomes, and ensure timely reporting.
+    </p>
+  </div>
+
+  <!-- Test Summary Cards -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-500">
+      <h2 class="text-gray-500 text-sm font-medium">Total Results</h2>
+      <p class="text-3xl font-bold text-blue-600">120</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-green-500">
+      <h2 class="text-gray-500 text-sm font-medium">Normal</h2>
+      <p class="text-3xl font-bold text-green-600">85</p>
+    </div>
+    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-red-500">
+      <h2 class="text-gray-500 text-sm font-medium">Abnormal</h2>
+      <p class="text-3xl font-bold text-red-600">35</p>
+    </div>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 gap-4">
+    <div class="w-full md:w-1/2">
+      <input type="text" placeholder="Search results..."
+        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+    </div>
+    <div>
+      <button
+        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-300">
+        + Add New Result
+      </button>
+    </div>
+  </div>
+
+  <!-- Test Results Table -->
+  <div class="max-w-7xl mx-auto overflow-x-auto">
+    <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+      <thead class="bg-blue-700 text-white">
+        <tr>
+          <th class="px-4 py-2 text-left">Test Name</th>
+          <th class="px-4 py-2 text-left">Patient</th>
+          <th class="px-4 py-2 text-left">Doctor</th>
+          <th class="px-4 py-2 text-left">Date</th>
+          <th class="px-4 py-2 text-left">Result</th>
+          <th class="px-4 py-2 text-left">Status</th>
+          <th class="px-4 py-2 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <!-- Example row -->
+        <tr>
+          <td class="px-4 py-2">Complete Blood Count</td>
+          <td class="px-4 py-2">John Doe</td>
+          <td class="px-4 py-2">Dr. Smith</td>
+          <td class="px-4 py-2">2025-09-20</td>
+          <td class="px-4 py-2">Normal</td>
+          <td class="px-4 py-2">
+            <span class="text-green-600 font-semibold">Normal</span>
+          </td>
+          <td class="px-4 py-2 text-center">
+            <button class="text-blue-600 hover:text-blue-800 mx-1">View</button>
+            <button class="text-yellow-600 hover:text-yellow-800 mx-1">Edit</button>
+            <button class="text-red-600 hover:text-red-800 mx-1">Delete</button>
+          </td>
+        </tr>
+        <!-- No results row -->
+        <tr>
+          <td colspan="7" class="text-center py-4 text-gray-500">No test results found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="max-w-7xl mx-auto mt-6 flex justify-end">
+    <button class="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300">Prev</button>
+    <button class="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300 ml-1">Next</button>
+  </div>
+
+</div>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
 import { Footer } from './components/footer/footer';
-import { Auth } from './services/auth';
+import { AuthService } from './services/auth';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +13,7 @@ import { Auth } from './services/auth';
   imports: [CommonModule, RouterModule, Navbar, Footer]
 })
 export class App {
-  constructor(public auth: Auth) {}
+  constructor(public auth: AuthService) {}
 
   // reactive signal for showing layout
   showLayout = computed(() => this.auth.loggedIn());

@@ -1,26 +1,45 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError } from 'rxjs';
+
+export interface Staff {
+  staff_id: string;
+  full_name: string;   // must match backend response
+  department: string;
+}
+
+interface LoginResponse {
+  success: boolean;
+  staff?: Staff;
+  message?: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
-export class Auth {
-  private apiUrl = 'http://localhost/login.php';
-
-  // signal to track login state
+export class AuthService {
+  private apiUrl = 'https://207.180.192.46/presbyterian-hospital/login.php';
   public loggedIn = signal<boolean>(!!localStorage.getItem('staff'));
 
   constructor(private http: HttpClient) {}
 
-  login(staffId: string, password: string): Observable<any> {
-    return this.http.post<any>(this.apiUrl, { staff_id: staffId, password })
+  // ✅ now accepts 3 arguments
+  login(staffId: string, department: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(this.apiUrl, { 
+        staff_id: staffId, 
+        department, 
+        password 
+      })
       .pipe(
         tap(response => {
-          if (response.success) {
+          if (response.success && response.staff) {
             localStorage.setItem('staff', JSON.stringify(response.staff));
             this.loggedIn.set(true);
           }
+        }),
+        catchError(err => {
+          console.error('Login error:', err);
+          return throwError(() => new Error('Login failed. Please try again.'));
         })
       );
   }
@@ -30,7 +49,7 @@ export class Auth {
     this.loggedIn.set(false);
   }
 
-  getStaff(): any {
+  getStaff(): Staff | null {
     const staff = localStorage.getItem('staff');
     return staff ? JSON.parse(staff) : null;
   }
