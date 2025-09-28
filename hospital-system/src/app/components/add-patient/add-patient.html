@@ -1,114 +1,128 @@
-<!-- add-patient.component.html -->
-<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
-  <h2 class="text-2xl font-bold text-blue-900 mb-6">Add New Patient</h2>
+<div *ngIf="isLoggedIn; else loginRedirect">
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6">Add New Patient</h2>
 
-  <form>
-    <!-- Personal Information -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- First Name -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">First Name</label>
-        <input type="text" placeholder="Enter first name"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    <form (ngSubmit)="onSubmit($event)">
+      <!-- Personal Information -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- First Name -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">First Name</label>
+          <input type="text" [(ngModel)]="firstName" name="firstName" placeholder="Enter first name"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <!-- Last Name -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Last Name</label>
+          <input type="text" [(ngModel)]="lastName" name="lastName" placeholder="Enter last name"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <!-- Ghana Card Number -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Ghana Card Number</label>
+          <input type="text" [(ngModel)]="ghanaCardNumber" name="ghanaCardNumber" placeholder="GHA-XXXXXXXXX-X"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <!-- Date of Birth -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Date of Birth</label>
+          <input type="date" [(ngModel)]="dateOfBirth" name="dateOfBirth"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <!-- Gender -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Gender</label>
+          <select [(ngModel)]="gender" name="gender"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+            <option value="">Select gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <!-- Blood Group -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Blood Group</label>
+          <select [(ngModel)]="bloodGroup" name="bloodGroup"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+            <option value="">Select blood group</option>
+            <option>A+</option>
+            <option>A-</option>
+            <option>B+</option>
+            <option>B-</option>
+            <option>O+</option>
+            <option>O-</option>
+            <option>AB+</option>
+            <option>AB-</option>
+          </select>
+        </div>
       </div>
 
-      <!-- Last Name -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Last Name</label>
-        <input type="text" placeholder="Enter last name"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      <!-- Contact Information -->
+      <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Contact Information</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Phone -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+          <input type="tel" [(ngModel)]="phoneNumber" name="phoneNumber" placeholder="+233 24 123 4567"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Email</label>
+          <input type="email" [(ngModel)]="email" name="email" placeholder="patient@example.com"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+
+        <!-- Address -->
+        <div class="md:col-span-2">
+          <label class="block text-gray-700 font-semibold mb-2">Residential Address</label>
+          <textarea rows="2" [(ngModel)]="residentialAddr" name="residentialAddr" placeholder="Enter address"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></textarea>
+        </div>
       </div>
 
-      <!-- Ghana Card Number -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Ghana Card Number</label>
-        <input type="text" placeholder="GHA-XXXXXXXXX-X"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      <!-- Emergency Contact -->
+      <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Emergency Contact</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Name</label>
+          <input type="text" [(ngModel)]="emergencyName" name="emergencyName" placeholder="Emergency contact name"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
+        <div>
+          <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+          <input type="tel" [(ngModel)]="emergencyPhone" name="emergencyPhone" placeholder="+233 20 987 6543"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+        </div>
       </div>
 
-      <!-- Date of Birth -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Date of Birth</label>
-        <input type="date"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+      <!-- Submit -->
+      <div class="mt-8 flex justify-end">
+        <button type="submit"
+          class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+          Save Patient
+        </button>
       </div>
+    </form>
 
-      <!-- Gender -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Gender</label>
-        <select
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <option value="">Select gender</option>
-          <option>Male</option>
-          <option>Female</option>
-          <option>Other</option>
-        </select>
-      </div>
-
-      <!-- Blood Group -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Blood Group</label>
-        <select
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          <option value="">Select blood group</option>
-          <option>A+</option>
-          <option>A-</option>
-          <option>B+</option>
-          <option>B-</option>
-          <option>O+</option>
-          <option>O-</option>
-          <option>AB+</option>
-          <option>AB-</option>
-        </select>
-      </div>
+    <!-- Success or Error message -->
+    <div *ngIf="message" class="mt-4 text-center">
+      <p [ngClass]="{'text-green-500': message.startsWith('✅'), 'text-red-500': message.startsWith('❌')}">{{ message }}</p>
     </div>
-
-    <!-- Contact Information -->
-    <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Contact Information</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Phone -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
-        <input type="tel" placeholder="+233 24 123 4567"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-      </div>
-
-      <!-- Email -->
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Email</label>
-        <input type="email" placeholder="patient@example.com"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-      </div>
-
-      <!-- Address -->
-      <div class="md:col-span-2">
-        <label class="block text-gray-700 font-semibold mb-2">Residential Address</label>
-        <textarea rows="2" placeholder="Enter address"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
-      </div>
-    </div>
-
-    <!-- Emergency Contact -->
-    <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Emergency Contact</h3>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Name</label>
-        <input type="text" placeholder="Emergency contact name"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-      </div>
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
-        <input type="tel" placeholder="+233 20 987 6543"
-          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
-      </div>
-    </div>
-
-    <!-- Submit -->
-    <div class="mt-8 flex justify-end">
-      <button type="submit"
-        class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
-        Save Patient
-      </button>
-    </div>
-  </form>
+  </div>
 </div>
+
+<!-- Login Redirect Message -->
+<ng-template #loginRedirect>
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+    <h2 class="text-2xl font-bold text-blue-900 mb-6">Access Denied</h2>
+    <p class="text-lg text-red-600">You need to be logged in to access this page. Please <a href="/login" class="text-blue-600">log in</a>.</p>
+  </div>
+</ng-template>
