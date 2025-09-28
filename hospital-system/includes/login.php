@@ -2,8 +2,9 @@
 // ----------------- DEBUG & ERROR -----------------
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_log', '/var/log/apache2/php_errors.log');
 error_reporting(E_ALL);
-error_log("login.php started");
 
 // ----------------- HEADERS -----------------
 header("Content-Type: application/json; charset=UTF-8");
@@ -20,6 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 if (session_status() === PHP_SESSION_NONE) {
     if (!session_start()) {
         error_log("DEBUG: Failed to start session");
+        http_response_code(500);
+        echo json_encode(["success" => false, "message" => "❌ Failed to start session."]);
+        exit;
     }
 }
 
@@ -28,7 +32,7 @@ require_once 'db_connect.php';
 if (!isset($pdo)) {
     error_log("DEBUG: PDO not set after db_connect.php");
     http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Database connection missing"]);
+    echo json_encode(["success" => false, "message" => "❌ Database connection missing."]);
     exit;
 }
 
@@ -36,12 +40,16 @@ if (!isset($pdo)) {
 $inputJSON = file_get_contents("php://input");
 if ($inputJSON === false) {
     error_log("DEBUG: Failed to read php://input");
+    http_response_code(400);
+    echo json_encode(["success" => false, "message" => "❌ Failed to read request data."]);
+    exit;
 }
+
 $input = json_decode($inputJSON, true);
 if ($input === null) {
     error_log("DEBUG: JSON decode failed: " . json_last_error_msg());
     http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Invalid JSON input"]);
+    echo json_encode(["success" => false, "message" => "❌ Invalid JSON input."]);
     exit;
 }
 
@@ -49,6 +57,7 @@ $staff_id   = trim($input['staff_id'] ?? '');
 $department = trim($input['department'] ?? '');
 $password   = trim($input['password'] ?? '');
 
+// Check if required fields are empty
 if (!$staff_id || !$department || !$password) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "⚠️ All fields are required."]);
@@ -57,48 +66,36 @@ if (!$staff_id || !$department || !$password) {
 
 // ----------------- AUTH LOGIC -----------------
 try {
+    // Check if staff exists in database
     $stmt = $pdo->prepare("SELECT staff_id, full_name, department, password FROM staff WHERE staff_id = :staff_id LIMIT 1");
     $stmt->execute([':staff_id' => $staff_id]);
     $staff = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Handle case where staff ID doesn't exist
     if (!$staff) {
+        error_log("DEBUG: Staff ID not found: $staff_id");
         http_response_code(401);
         echo json_encode(["success" => false, "message" => "❌ Invalid Staff ID."]);
         exit;
     }
 
-    // First-time login: password empty
-    if (empty($staff['password'])) {
-        if (strlen($password) < 8 || strlen($password) > 20) {
-            http_response_code(400);
-            echo json_encode(["success" => false, "message" => "⚠️ Password must be 8–20 characters."]);
-            exit;
-        }
-
-        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $update = $pdo->prepare("UPDATE staff SET password = :password, department = :department WHERE staff_id = :staff_id");
-        $update->execute([
-            ':password' => $hashedPassword,
-            ':department' => $department,
-            ':staff_id' => $staff_id
-        ]);
-
-        $staff['password'] = $hashedPassword;
-        $staff['department'] = $department;
-    }
-
+    // Check if the provided department matches the one in the database
     if ($staff['department'] !== $department) {
+        error_log("DEBUG: Department mismatch for staff_id: $staff_id");
         http_response_code(401);
         echo json_encode(["success" => false, "message" => "⚠️ Incorrect department."]);
         exit;
     }
 
+    // Verify the provided password against the hashed one
     if (!password_verify($password, $staff['password'])) {
+        error_log("DEBUG: Invalid password attempt for staff_id: $staff_id");
         http_response_code(401);
         echo json_encode(["success" => false, "message" => "❌ Invalid password."]);
         exit;
     }
 
+    // Successful login: Set session variables
     $_SESSION['staff_id']   = $staff['staff_id'];
     $_SESSION['full_name']  = $staff['full_name'];
     $_SESSION['department'] = $staff['department'];
@@ -106,10 +103,12 @@ try {
     echo json_encode(["success" => true, "message" => "✅ Login successful", "staff" => $staff]);
 
 } catch (PDOException $e) {
+    // Handle database errors
     error_log("DB ERROR in login.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(["success" => false, "message" => "❌ Server error. Please try again later."]);
 } catch (Exception $e) {
+    // Handle general errors
     error_log("GENERAL ERROR in login.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(["success" => false, "message" => "❌ Server error. Please try again later."]);

@@ -16,7 +16,7 @@ export class Navbar {
   dropdownTimeout: any; // timer to delay closing
 
   constructor(public auth: AuthService, private router: Router) {}
-  
+
   // Toggle mobile menu open/close
   toggleMenu(): void {
     this.menuOpen = !this.menuOpen;

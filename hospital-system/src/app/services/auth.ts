@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 
 export interface Staff {
@@ -18,30 +18,38 @@ interface LoginResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://207.180.192.46/presbyterian-hospital/login.php';
+  // API endpoint relative to current domain
+ private apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/login.php';
+
   public loggedIn = signal<boolean>(!!localStorage.getItem('staff'));
 
   constructor(private http: HttpClient) {}
 
-  // ✅ now accepts 3 arguments
   login(staffId: string, department: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.apiUrl, { 
-        staff_id: staffId, 
-        department, 
-        password 
+    // Trim inputs to avoid invisible characters
+    const payload = {
+      staff_id: staffId.trim(),
+      department: department.trim(),
+      password: password.trim()
+    };
+
+    console.log('DEBUG: Payload being sent to backend:', payload);
+
+    return this.http.post<LoginResponse>(this.apiUrl, payload, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    }).pipe(
+      tap(response => {
+        console.log('DEBUG: Response from backend:', response);
+        if (response.success && response.staff) {
+          localStorage.setItem('staff', JSON.stringify(response.staff));
+          this.loggedIn.set(true);
+        }
+      }),
+      catchError(err => {
+        console.error('Login error:', err);
+        return throwError(() => new Error('Login failed. Please try again.'));
       })
-      .pipe(
-        tap(response => {
-          if (response.success && response.staff) {
-            localStorage.setItem('staff', JSON.stringify(response.staff));
-            this.loggedIn.set(true);
-          }
-        }),
-        catchError(err => {
-          console.error('Login error:', err);
-          return throwError(() => new Error('Login failed. Please try again.'));
-        })
-      );
+    );
   }
 
   logout(): void {

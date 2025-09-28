@@ -17,6 +17,7 @@ export class Login {
   password: string = '';
   message: string = '';
   showPassword: boolean = false;
+  isLoading: boolean = false; // to handle the loading state
 
   constructor(private router: Router, private auth: AuthService) {}
 
@@ -25,6 +26,7 @@ export class Login {
   }
 
   login(): void {
+    this.isLoading = true; // start loading indicator
     this.message = '';
 
     // Strong password regex
@@ -34,6 +36,7 @@ export class Login {
     // Check required fields
     if (!this.staff_id || !this.department || !this.password) {
       this.message = '⚠️ All fields are required';
+      this.isLoading = false; // stop loading if validation fails
       return;
     }
 
@@ -41,21 +44,27 @@ export class Login {
     if (!passwordRegex.test(this.password)) {
       this.message =
         '⚠️ Password must be 8-20 chars, include uppercase, lowercase, number, and special char';
+      this.isLoading = false; // stop loading if password doesn't meet criteria
       return;
     }
 
     // Call AuthService with all 3 values
     this.auth.login(this.staff_id, this.department, this.password).subscribe({
       next: (res) => {
+        this.isLoading = false; // stop loading after response
         if (res.success && res.staff) {
           this.router.navigate(['/dashboard']);
         } else {
-          this.message = res.message || '❌ Invalid credentials';
+          // More user-friendly error handling
+          this.message = '❌ The credentials provided do not match our records. Please double-check and try again.';
         }
       },
       error: (err) => {
+        this.isLoading = false; // stop loading in case of error
         console.error('Login error:', err);
-        this.message = '❌ Server error. Please try again later';
+
+        // General error handling
+        this.message = '❌ Something went wrong. Please check your credentials and try again.';
       }
     });
   }

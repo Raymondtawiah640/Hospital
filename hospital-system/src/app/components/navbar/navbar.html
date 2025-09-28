@@ -104,17 +104,29 @@
         </div>
 
         <!-- Auth Section -->
-        <div class="flex items-center ml-6">
+        <div class="flex items-center ml-6 relative">
           <ng-container *ngIf="isLoggedIn; else guestLinks">
-            <span class="mr-4">👋 {{ staffName }}</span>
-            <button (click)="logout()" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded-lg">Logout</button>
+            <!-- Profile Icon and Name -->
+            <div (click)="toggleDropdown('profile')" class="flex items-center space-x-2 cursor-pointer">
+              <img src="path_to_your_profile_icon.png" alt="Profile" class="w-8 h-8 rounded-full">
+              <span class="mr-4">{{ staffName }}</span>
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div *ngIf="openDropdown === 'profile'" class="absolute right-0 mt-2 bg-white text-black rounded shadow-lg w-48 z-50">
+              <button (click)="logout()" class="w-full text-left px-4 py-2 hover:bg-gray-200 rounded-b-lg">Logout</button>
+            </div>
           </ng-container>
+
+          <!-- Guest Links -->
           <ng-template #guestLinks>
             <a routerLink="/login" (click)="navigateAndClose()" class="flex items-center space-x-2 hover:text-green-400">
               <span>Login</span>
             </a>
           </ng-template>
         </div>
+
+
       </div>
 
       <!-- Mobile Menu Button -->
