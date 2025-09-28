@@ -9,19 +9,18 @@ import { CommonModule } from '@angular/common';
   selector: 'app-schedules',
   templateUrl: './schedules.html',
   styleUrls: ['./schedules.css'],
-  imports: [FormsModule, CommonModule]  // Ensure these modules are imported
+  imports: [FormsModule, CommonModule]  // Ensure FormsModule and CommonModule are imported
 })
 export class Schedules implements OnInit {
   doctors: any[] = [];
-  schedules: any[] = [];
-  selectedDoctor: any = null;
   scheduleData = {
-    doctorId: '',
+    doctorId: 0,  // Set default value as 0 (number)
     day: '',
     startTime: '',
     endTime: '',
     department: ''
   };
+
   isLoading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
@@ -42,7 +41,6 @@ export class Schedules implements OnInit {
       this.router.navigate(['/login']);
     } else {
       this.loadDoctors();  // Load doctors on component initialization
-      this.loadSchedules(); // Load existing schedules
     }
   }
 
@@ -54,7 +52,7 @@ export class Schedules implements OnInit {
         next: (data: any) => {
           this.isLoading = false;
           if (data.success) {
-            this.doctors = data.doctors;  // Ensure this is the correct structure
+            this.doctors = data.doctors;  // Store the list of doctors
           } else {
             this.errorMessage = 'Failed to load doctor data.';
           }
@@ -67,61 +65,34 @@ export class Schedules implements OnInit {
       });
   }
 
-  // Load schedule data
-  loadSchedules(): void {
-    this.isLoading = true;
-    this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-schedule.php') // Endpoint to get schedules
-      .subscribe({
-        next: (data: any) => {
-          this.isLoading = false;
-          if (data.success) {
-            this.schedules = data.schedules;
-          } else {
-            this.errorMessage = 'Failed to load schedules.';
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          console.error('Error loading schedules:', err);
-          this.errorMessage = 'There was a problem fetching schedules.';
-        }
-      });
-  }
-
-  // Handle the doctor selection change
-  onDoctorChange(): void {
-    const doctorId = this.scheduleData.doctorId;
-    if (doctorId) {
-      // Find the doctor based on ID from the list
-      this.selectedDoctor = this.doctors.find(doctor => doctor.id === parseInt(doctorId));
-    }
-  }
-
-  // Handle form submission
+  // Handle form submission for adding schedule
   onSubmit(): void {
     this.errorMessage = '';
     this.successMessage = '';
     this.isLoading = true;
 
+    // Ensure doctorId is a number before sending it to the server
+    this.scheduleData.doctorId = +this.scheduleData.doctorId;  // Convert to number using unary plus
+
     if (this.scheduleData.doctorId && this.scheduleData.day && this.scheduleData.startTime && this.scheduleData.endTime && this.scheduleData.department) {
-      // Send schedule data via POST request
-      this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-schedule.php', this.scheduleData)
-        .subscribe({
-          next: (response: any) => {
-            this.isLoading = false;
-            if (response.success) {
-              this.successMessage = 'Schedule added successfully!';
-              this.loadSchedules(); // Reload schedules after successful submission
-            } else {
-              this.errorMessage = response.message || 'Failed to add schedule.';
-            }
-          },
-          error: (err) => {
-            this.isLoading = false;
-            console.error('Error adding schedule:', err);
-            this.errorMessage = 'There was a problem with the request. Please try again later.';
+      // Send data as POST request to add schedule
+      this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-schedule.php', this.scheduleData, {
+        headers: { 'Content-Type': 'application/json' }
+      }).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+          if (response.success) {
+            this.successMessage = 'Schedule added successfully!';
+          } else {
+            this.errorMessage = response.message || 'Failed to add schedule.';
           }
-        });
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Error adding schedule:', err);
+          this.errorMessage = 'There was a problem with the request. Please try again later.';
+        }
+      });
     } else {
       this.isLoading = false;
       this.errorMessage = 'Please fill in all fields.';

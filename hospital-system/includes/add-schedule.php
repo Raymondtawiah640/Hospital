@@ -1,51 +1,55 @@
 <?php
 require_once 'db_connect.php'; // Include database connection
 
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
 header('Content-Type: application/json');
 
-// Check for POST request to add a new schedule
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Gather input data
-    $doctorName = isset($_POST['doctorName']) ? $_POST['doctorName'] : '';  // Change to doctorName
-    $day = isset($_POST['day']) ? $_POST['day'] : '';
-    $startTime = isset($_POST['startTime']) ? $_POST['startTime'] : '';
-    $endTime = isset($_POST['endTime']) ? $_POST['endTime'] : '';
-    $department = isset($_POST['department']) ? $_POST['department'] : '';
+// Debugging: Check if the method is POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    echo json_encode(["success" => false, "message" => "Invalid request method. Requested method: " . $_SERVER['REQUEST_METHOD']]);
+    exit;
+}
 
-    // Validate input
-    if (empty($doctorName) || empty($day) || empty($startTime) || empty($endTime) || empty($department)) {
-        echo json_encode(["success" => false, "message" => "All fields are required."]);
-        exit;
-    }
+// Read the raw POST data
+$inputData = json_decode(file_get_contents('php://input'), true);
 
-    // Fetch doctor information by name
-    $doctorStmt = $pdo->prepare("SELECT * FROM doctors WHERE CONCAT(first_name, ' ', last_name) = :doctorName");
-    $doctorStmt->execute([':doctorName' => $doctorName]);
-    $doctor = $doctorStmt->fetch(PDO::FETCH_ASSOC);
+// Debugging: Output raw POST data to check if data is being received
+if (!$inputData) {
+    echo json_encode(["success" => false, "message" => "No data received in the POST request"]);
+    exit;
+}
 
-    if (!$doctor) {
-        echo json_encode(["success" => false, "message" => "Doctor not found."]);
-        exit;
-    }
+// Gather input data from the decoded JSON
+$doctorId = isset($inputData['doctorId']) ? $inputData['doctorId'] : '';
+$day = isset($inputData['day']) ? $inputData['day'] : '';
+$startTime = isset($inputData['startTime']) ? $inputData['startTime'] : '';
+$endTime = isset($inputData['endTime']) ? $inputData['endTime'] : '';
+$department = isset($inputData['department']) ? $inputData['department'] : '';
 
-    // Insert the schedule into the database
-    $stmt = $pdo->prepare("INSERT INTO doctor_schedules (doctor_id, day, start_time, end_time, department) 
-                           VALUES (:doctorId, :day, :startTime, :endTime, :department)");
-    $stmt->execute([
-        ':doctorId' => $doctor['id'],  // Use the doctor's ID from the fetched record
-        ':day' => $day,
-        ':startTime' => $startTime,
-        ':endTime' => $endTime,
-        ':department' => $department
-    ]);
+// Validate input
+if (empty($doctorId) || empty($day) || empty($startTime) || empty($endTime) || empty($department)) {
+    echo json_encode(["success" => false, "message" => "All fields are required."]);
+    exit;
+}
 
-    // Check if the insertion was successful
-    if ($stmt->rowCount() > 0) {
-        echo json_encode(["success" => true, "message" => "Schedule added successfully."]);
-    } else {
-        echo json_encode(["success" => false, "message" => "Failed to add schedule."]);
-    }
+// Insert the schedule into the database
+$stmt = $pdo->prepare("INSERT INTO doctor_schedules (doctor_id, day, start_time, end_time, department) 
+                       VALUES (:doctorId, :day, :startTime, :endTime, :department)");
+$stmt->execute([
+    ':doctorId' => $doctorId,
+    ':day' => $day,
+    ':startTime' => $startTime,
+    ':endTime' => $endTime,
+    ':department' => $department
+]);
+
+// Check if the insertion was successful
+if ($stmt->rowCount() > 0) {
+    echo json_encode(["success" => true, "message" => "Schedule added successfully."]);
 } else {
-    echo json_encode(["success" => false, "message" => "Invalid request method."]);
+    echo json_encode(["success" => false, "message" => "Failed to add schedule."]);
 }
 ?>
