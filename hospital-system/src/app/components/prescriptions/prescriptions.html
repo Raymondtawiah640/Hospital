@@ -1,86 +1,90 @@
-<div class="min-h-screen bg-gray-100 p-6 space-y-8">
+<div *ngIf="isLoggedIn" class="flex justify-center items-center min-h-screen bg-gray-100">
+  <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg w-full sm:w-4/5 lg:w-1/2">
+    <h2 class="text-2xl font-bold text-center mb-4">Prescribe Medicine</h2>
 
-  <!-- Page Header -->
-  <div class="max-w-7xl mx-auto mb-6">
-    <h1 class="text-3xl font-bold text-blue-700">Prescriptions</h1>
-    <p class="text-gray-600 mt-1">
-      Manage and track all patient prescriptions. View details, issuing doctors, and prescription statuses.
-    </p>
-  </div>
-
-  <!-- Prescription Summary Cards -->
-  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-blue-500">
-      <h2 class="text-gray-500 text-sm font-medium">Total Prescriptions</h2>
-      <p class="text-3xl font-bold text-blue-600">200</p>
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="flex justify-center mb-4">
+      <div class="spinner-border animate-spin inline-block w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
     </div>
-    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-green-500">
-      <h2 class="text-gray-500 text-sm font-medium">Active Prescriptions</h2>
-      <p class="text-3xl font-bold text-green-600">150</p>
-    </div>
-    <div class="bg-white shadow-lg rounded-lg p-6 border-l-4 border-red-500">
-      <h2 class="text-gray-500 text-sm font-medium">Expired Prescriptions</h2>
-      <p class="text-3xl font-bold text-red-600">50</p>
-    </div>
-  </div>
 
-  <!-- Search & Add Prescription -->
-  <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 gap-4">
-    <div class="w-full md:w-1/2">
-      <input type="text" placeholder="Search prescriptions..."
-        class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+    <!-- Success and Error Messages -->
+    <div *ngIf="successMessage" class="text-green-500 text-center mb-4">
+      {{ successMessage }}
     </div>
-    <div>
-      <button
-        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md transition duration-300">
-        + Add New Prescription
-      </button>
+    <div *ngIf="errorMessage" class="text-red-500 text-center mb-4">
+      {{ errorMessage }}
     </div>
-  </div>
 
-  <!-- Prescription Table -->
-  <div class="max-w-7xl mx-auto overflow-x-auto">
-    <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
-      <thead class="bg-blue-700 text-white">
-        <tr>
-          <th class="px-4 py-2 text-left">Patient</th>
-          <th class="px-4 py-2 text-left">Doctor</th>
-          <th class="px-4 py-2 text-left">Medication</th>
-          <th class="px-4 py-2 text-left">Dosage</th>
-          <th class="px-4 py-2 text-left">Date Issued</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200">
-        <!-- Example row -->
-        <tr>
-          <td class="px-4 py-2">John Doe</td>
-          <td class="px-4 py-2">Dr. Smith</td>
-          <td class="px-4 py-2">Paracetamol 500mg</td>
-          <td class="px-4 py-2">2 tablets daily</td>
-          <td class="px-4 py-2">2025-09-25</td>
-          <td class="px-4 py-2">
-            <span class="text-green-600 font-semibold">Active</span>
-          </td>
-          <td class="px-4 py-2 text-center">
-            <button class="text-blue-600 hover:text-blue-800 mx-1">View</button>
-            <button class="text-yellow-600 hover:text-yellow-800 mx-1">Edit</button>
-            <button class="text-red-600 hover:text-red-800 mx-1">Delete</button>
-          </td>
-        </tr>
-        <!-- No prescriptions -->
-        <tr>
-          <td colspan="7" class="text-center py-4 text-gray-500">No prescriptions found.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Search Patient -->
+    <div class="mb-4">
+      <label for="patientName" class="block text-gray-700">Search Patient by Name</label>
+      <input id="patientName" [(ngModel)]="patientName" (input)="searchPatient()" placeholder="Enter patient name"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    </div>
 
-  <!-- Pagination -->
-  <div class="max-w-7xl mx-auto mt-6 flex justify-end">
-    <button class="px-3 py-1 bg-gray-200 rounded-l hover:bg-gray-300">Prev</button>
-    <button class="px-3 py-1 bg-gray-200 rounded-r hover:bg-gray-300 ml-1">Next</button>
-  </div>
+    <!-- Patient List (Filtered by Name) -->
+    <div *ngIf="patients.length > 0" class="mb-4">
+      <label for="patient" class="block text-gray-700">Select Patient</label>
+      <select id="patient" [(ngModel)]="prescriptionData.patientId" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <option value="">Select patient</option>
+        <option *ngFor="let patient of patients" [value]="patient.id">
+          {{ patient.first_name }} {{ patient.last_name }}
+        </option>
+      </select>
+    </div>
 
+    <!-- Medicine Prescription -->
+    <div class="mt-4 mb-4">
+      <label for="medicine" class="block text-gray-700">Search and Select Medicine</label>
+      <input type="text" [(ngModel)]="prescriptionData.medicine" (input)="filterMedicines()" placeholder="Search for a medicine"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <br>
+      <select id="medicine" [(ngModel)]="prescriptionData.medicine" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        <option value="">Select medicine</option>
+        <option *ngFor="let medicine of filteredMedicines" [value]="medicine.name">
+          {{ medicine.name }} (Stock: {{ medicine.stock_quantity }})
+        </option>
+      </select>
+    </div>
+
+    <!-- Dosage and Instructions -->
+    <div class="mt-4 mb-4">
+      <label for="dosage" class="block text-gray-700">Dosage</label>
+      <input id="dosage" [(ngModel)]="prescriptionData.dosage" type="text" placeholder="Enter dosage"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+    </div>
+
+    <div class="mt-4 mb-6">
+      <label for="instructions" class="block text-gray-700">Instructions</label>
+      <textarea id="instructions" [(ngModel)]="prescriptionData.instructions" rows="3" placeholder="Enter instructions"
+        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+    </div>
+
+          <!-- Submit Button -->
+      <div class="mt-6 text-center">
+        <button (click)="prescribeMedicine()" 
+                [disabled]="!prescriptionData.patientId || !prescriptionData.medicine || !prescriptionData.dosage"
+                class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center">
+                
+          <!-- SVG Spinner, visible when isLoading is true -->
+          <svg *ngIf="isLoading" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 mr-2 animate-spin">
+            <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" class="opacity-25"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 1 1 8 8 8 8 0 0 1-8-8z"/>
+          </svg>
+
+          <!-- Button Text -->
+          <span *ngIf="!isLoading">Prescribe Medicine</span>
+          <span *ngIf="isLoading">Loading...</span>
+        </button>
+      </div>
+
+  </div>
+</div>
+
+<div *ngIf="!isLoggedIn" class="flex justify-center items-center min-h-screen bg-gray-100">
+  <div class="container text-center">
+    <p>Please log in as a doctor to prescribe medicine.</p>
+  </div>
 </div>

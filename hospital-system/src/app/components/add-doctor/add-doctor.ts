@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 })
 export class AddDoctor implements OnInit {
   doctorData = {
+    role: 'doctor',
     doctorId: '',
     ghanaCard: '',
     firstName: '',
@@ -54,23 +55,27 @@ export class AddDoctor implements OnInit {
     this.isLoading = true;
 
     if (this.isLoggedIn) {
-      this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-doctor.php', this.doctorData)
+      const apiUrl = this.doctorData.role === 'doctor' 
+        ? 'https://kilnenterprise.com/presbyterian-hospital/add-doctor.php' 
+        : 'https://kilnenterprise.com/presbyterian-hospital/add-nurse.php'; 
+
+      this.http.post(apiUrl, this.doctorData)
         .subscribe({
           next: (response: any) => {
             this.isLoading = false;
             if (response.success) {
-              this.successMessage = 'Doctor added successfully!';
+              this.successMessage = `${this.doctorData.role.charAt(0).toUpperCase() + this.doctorData.role.slice(1)} added successfully!`;
               this.resetForm();
               setTimeout(() => {
-                this.router.navigate(['/add-doctor']);
+                this.router.navigate([`/add-${this.doctorData.role}`]);
               }, 1500);
             } else {
-              this.errorMessage = response.message || 'An error occurred while adding the doctor.';
+              this.errorMessage = response.message || 'An error occurred while adding the user.';
             }
           },
           error: (err) => {
             this.isLoading = false;
-            console.error('Error adding doctor:', err);
+            console.error('Error adding user:', err);
             this.errorMessage = 'There was a problem with the request. Please try again later.';
           }
         });
@@ -81,6 +86,7 @@ export class AddDoctor implements OnInit {
 
   resetForm() {
     this.doctorData = {
+      role: 'doctor',
       doctorId: '',
       ghanaCard: '',
       firstName: '',

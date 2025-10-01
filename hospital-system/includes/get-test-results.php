@@ -14,31 +14,25 @@ if (!isset($pdo)) {
 }
 
 try {
-    // SQL query to fetch the test results from the database, including doctor and patient information
-    $stmt = $pdo->prepare("
-        SELECT 
-            lab.id, 
-            lab.name, 
-            p.first_name AS patient_first_name, 
-            p.last_name AS patient_last_name, 
-            d.first_name AS doctor_first_name, 
-            d.last_name AS doctor_last_name, 
-            lab.date, 
-            lab.status, 
-            lab.type
-        FROM laboratory_tests lab
-        LEFT JOIN patients p ON lab.patient_id = p.id
-        LEFT JOIN doctors d ON lab.doctor = d.doctor_id
-    ");
+    // SQL query to fetch the test results from the database
+    $stmt = $pdo->prepare("SELECT lab.id, 
+                                  lab.name, 
+                                  p.first_name AS patient_first_name, 
+                                  p.last_name AS patient_last_name, 
+                                  d.first_name AS doctor_first_name, 
+                                  d.last_name AS doctor_last_name, 
+                                  lab.date, 
+                                  lab.status, 
+                                  lab.type
+                           FROM laboratory_tests lab
+                           LEFT JOIN patients p ON lab.patient_id = p.id
+                           LEFT JOIN doctors d ON lab.doctor = d.id");
 
     // Execute the query
     $stmt->execute();
 
     // Fetch all the results
     $testResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Debug: Check if any results were fetched
-    error_log("Fetched test results: " . json_encode($testResults));
 
     // Check if any results were fetched
     if ($testResults) {
