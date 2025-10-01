@@ -91,14 +91,26 @@
         </div>
       </div>
 
-      <!-- Submit -->
-      <div class="text-center">
-        <button type="submit" [disabled]="isLoading || !scheduleData.patientId || !scheduleData.doctorId || !scheduleData.department || !scheduleData.date || !scheduleData.time || !scheduleData.reason"
-                class="px-6 py-2 bg-blue-900 text-white rounded-lg shadow hover:bg-blue-700 transition">
+     <!-- Submit -->
+      <div class="text-center mt-6">
+        <button type="submit"
+                [disabled]="isLoading || !scheduleData.patientId || !scheduleData.doctorId || !scheduleData.department || !scheduleData.date || !scheduleData.time || !scheduleData.reason"
+                class="flex items-center justify-center gap-2 px-6 py-2 bg-blue-900 text-white rounded-lg shadow hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed">
+
+          <!-- Spinner -->
+          <svg *ngIf="isLoading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+              viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
+          </svg>
+
+          <!-- Button Label -->
           <span *ngIf="isLoading">Saving...</span>
           <span *ngIf="!isLoading">Book Appointment</span>
         </button>
       </div>
+
     </form>
   </div>
 </div>

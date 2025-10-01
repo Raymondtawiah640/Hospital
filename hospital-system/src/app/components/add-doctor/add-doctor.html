@@ -6,7 +6,6 @@
     <div *ngIf="successMessage" class="text-green-500 mb-4">
       {{ successMessage }}
     </div>
-    
     <div *ngIf="errorMessage" class="text-red-500 mb-4">
       {{ errorMessage }}
     </div>
@@ -29,7 +28,6 @@
       <!-- Personal Information -->
       <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Personal Information</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Fields for First Name, Last Name, Date of Birth, Gender -->
         <div>
           <label for="firstName" class="block text-gray-700 font-semibold mb-2">First Name</label>
           <input id="firstName" name="firstName" [(ngModel)]="doctorData.firstName" required
@@ -111,10 +109,19 @@
         </div>
       </div>
 
-      <!-- Submit Button -->
+      <!-- Submit Button with Loading Spinner -->
       <div class="mt-8 flex justify-end">
-        <button type="submit" [disabled]="!doctorForm.form.valid || isLoading"
-          class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+        <button type="submit"
+                [disabled]="!doctorForm.form.valid || isLoading"
+                class="flex items-center justify-center gap-2 bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-60 disabled:cursor-not-allowed">
+
+          <!-- Spinner -->
+          <svg *ngIf="isLoading" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
+          </svg>
+
+          <!-- Button Text -->
           <span *ngIf="isLoading">Saving...</span>
           <span *ngIf="!isLoading">Save Doctor</span>
         </button>
@@ -122,3 +129,4 @@
     </form>
   </div>
 </div>
+

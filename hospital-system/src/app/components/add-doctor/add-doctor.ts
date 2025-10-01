@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth';  // Import your AuthService
+import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,10 +9,10 @@ import { CommonModule } from '@angular/common';
   selector: 'app-add-doctor',
   templateUrl: './add-doctor.html',
   styleUrls: ['./add-doctor.css'],
-  imports: [FormsModule, CommonModule]  // Make sure FormsModule is added for ngModel
+  standalone: true,
+  imports: [FormsModule, CommonModule]
 })
 export class AddDoctor implements OnInit {
-  // Initialize the doctorData object with empty values
   doctorData = {
     doctorId: '',
     ghanaCard: '',
@@ -28,63 +28,57 @@ export class AddDoctor implements OnInit {
     email: '',
     address: ''
   };
-  isLoggedIn: boolean = false;
-  errorMessage: string = '';  // To store error messages
-  successMessage: string = '';  // To store success messages
-  isLoading: boolean = false;  // To manage loading state
+
+  isLoggedIn = false;
+  errorMessage = '';
+  successMessage = '';
+  isLoading = false;
 
   constructor(
-    private http: HttpClient, 
-    private router: Router, 
+    private http: HttpClient,
+    private router: Router,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Check if the user is logged in
     this.isLoggedIn = this.authService.loggedIn();
 
-    // If not logged in, redirect to login page
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     }
   }
 
   onSubmit() {
-    // Clear previous messages
     this.errorMessage = '';
     this.successMessage = '';
-    this.isLoading = true;  // Start loading
+    this.isLoading = true;
 
-    // Check if user is logged in
     if (this.isLoggedIn) {
-      // Send POST request to backend with doctorData
       this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-doctor.php', this.doctorData)
         .subscribe({
           next: (response: any) => {
-            this.isLoading = false;  // Stop loading
+            this.isLoading = false;
             if (response.success) {
               this.successMessage = 'Doctor added successfully!';
-              this.resetForm();  // Reset form fields after successful submission
+              this.resetForm();
               setTimeout(() => {
-                this.router.navigate(['/add-doctor']);  // Refresh the page by navigating to the same route
-              }, 1500);  // Wait for 1.5 seconds before navigating back
+                this.router.navigate(['/add-doctor']);
+              }, 1500);
             } else {
               this.errorMessage = response.message || 'An error occurred while adding the doctor.';
             }
           },
           error: (err) => {
-            this.isLoading = false;  // Stop loading on error
+            this.isLoading = false;
             console.error('Error adding doctor:', err);
             this.errorMessage = 'There was a problem with the request. Please try again later.';
           }
         });
     } else {
-      // If not logged in, redirect to login page
       this.router.navigate(['/login']);
     }
   }
 
-  // Reset form data after submission
   resetForm() {
     this.doctorData = {
       doctorId: '',
