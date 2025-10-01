@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth';  // Import the AuthService
+import { AuthService } from '../../services/auth';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -9,44 +9,43 @@ import { CommonModule } from '@angular/common';
   selector: 'app-all-doctors',
   templateUrl: './all-doctors.html',
   styleUrls: ['./all-doctors.css'],
-  imports: [FormsModule, CommonModule]  // Import FormsModule and CommonModule here
+  standalone: true,
+  imports: [FormsModule, CommonModule]
 })
 export class AllDoctors implements OnInit {
-  doctors: any[] = [];  // Array to hold doctors
-  selectedDoctorSchedules: any[] = [];  // Array to hold selected doctor's schedules
-  selectedDoctorId: number = 0;  // Store selected doctor ID
+  doctors: any[] = [];
+  selectedDoctorSchedules: any[] = [];
+  selectedDoctorId: number = 0;
 
-  isLoading: boolean = false;  // Loading state for API calls
-  errorMessage: string = '';  // To store error message
-  isLoggedIn: boolean = false;  // To store login status
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  isLoggedIn: boolean = false;
+
+  searchTerm: string = ''; // 🔍 New: search input model
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private authService: AuthService  // Inject AuthService
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Check if the user is logged in
     this.isLoggedIn = this.authService.loggedIn();
-    
-    // If not logged in, redirect to login page
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     } else {
-      this.loadDoctors();  // Load doctor data on component initialization
+      this.loadDoctors();
     }
   }
 
-  // Load doctor data with schedules
   loadDoctors(): void {
     this.isLoading = true;
-    this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-doctor.php')  // Endpoint to get doctors
+    this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-doctor.php')
       .subscribe({
         next: (data: any) => {
           this.isLoading = false;
           if (data.success) {
-            this.doctors = data.doctors;  // Store the list of doctors
+            this.doctors = data.doctors;
           } else {
             this.errorMessage = 'Failed to load doctor data.';
           }
@@ -59,15 +58,14 @@ export class AllDoctors implements OnInit {
       });
   }
 
-  // Load schedules for the selected doctor
   loadDoctorSchedules(doctorId: number): void {
     this.isLoading = true;
-    this.http.get(`https://kilnenterprise.com/presbyterian-hospital/get-schedule.php?doctorId=${doctorId}`)  // Endpoint to get schedules for specific doctor
+    this.http.get(`https://kilnenterprise.com/presbyterian-hospital/get-schedule.php?doctorId=${doctorId}`)
       .subscribe({
         next: (data: any) => {
           this.isLoading = false;
           if (data.success) {
-            this.selectedDoctorSchedules = data.schedules;  // Store schedules for the selected doctor
+            this.selectedDoctorSchedules = data.schedules;
           } else {
             this.errorMessage = 'Failed to load schedules for the selected doctor.';
           }
@@ -80,14 +78,23 @@ export class AllDoctors implements OnInit {
       });
   }
 
-  // Handle doctor selection change
   onDoctorChange(event: any): void {
-    const selectedDoctorId = event.target.value;  // Get selected doctor ID
+    const selectedDoctorId = event.target.value;
     this.selectedDoctorId = selectedDoctorId;
     if (selectedDoctorId) {
-      this.loadDoctorSchedules(selectedDoctorId);  // Load schedules for the selected doctor
+      this.loadDoctorSchedules(selectedDoctorId);
     } else {
-      this.selectedDoctorSchedules = [];  // Clear schedules if no doctor is selected
+      this.selectedDoctorSchedules = [];
     }
+  }
+
+  // 🔍 Getter to filter doctors based on search term
+  get filteredDoctors(): any[] {
+    const term = this.searchTerm.toLowerCase();
+    return this.doctors.filter(doctor =>
+      doctor.first_name.toLowerCase().includes(term) ||
+      doctor.last_name.toLowerCase().includes(term) ||
+      doctor.doctor_id.toLowerCase().includes(term)
+    );
   }
 }
