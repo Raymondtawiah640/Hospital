@@ -18,20 +18,7 @@
 
   <!-- Dashboard Content -->
   <main class="max-w-7xl mx-auto px-6 py-8">
-    <!-- Example Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-gray-500 text-sm font-medium">Total Patients</h2>
-        <p class="text-3xl font-bold text-blue-600">1,250</p>
-      </div>
-      <div class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-gray-500 text-sm font-medium">Active Doctors</h2>
-        <p class="text-3xl font-bold text-green-600">75</p>
-      </div>
-      <div class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-gray-500 text-sm font-medium">Appointments Today</h2>
-        <p class="text-3xl font-bold text-yellow-600">42</p>
-      </div>
-    </div>
+    <app-dashboard-highlight></app-dashboard-highlight>
+    <app-dashboard-summary></app-dashboard-summary>
   </main>
 </div>
