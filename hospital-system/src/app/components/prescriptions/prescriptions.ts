@@ -13,12 +13,12 @@ import { FormsModule } from '@angular/forms'; // <-- Import FormsModule
   imports: [CommonModule, FormsModule]  // <-- Add FormsModule here
 })
 export class Prescriptions implements OnInit {
-  isLoggedIn: boolean = false; // Track login status
-  doctorId: string = ''; // Track the doctor ID
-  patientName: string = ''; // Track patient name to search
-  patients: any[] = []; // List of patients fetched from API
-  medicines: any[] = []; // List of available medicines with stock quantity
-  filteredMedicines: any[] = []; // Filtered medicines based on search
+  isLoggedIn: boolean = false;
+  doctorId: string = '';
+  patientName: string = '';
+  patients: any[] = []; 
+  medicines: any[] = [];
+  filteredMedicines: any[] = [];
   prescriptionData = {
     patientId: '',
     medicine: '',

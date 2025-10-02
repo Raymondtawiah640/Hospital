@@ -41,6 +41,7 @@
       <input type="text" [(ngModel)]="prescriptionData.medicine" (input)="filterMedicines()" placeholder="Search for a medicine"
         class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
         <br>
+        <br>
       <select id="medicine" [(ngModel)]="prescriptionData.medicine" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
         <option value="">Select medicine</option>
         <option *ngFor="let medicine of filteredMedicines" [value]="medicine.name">
