@@ -6,10 +6,11 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 require_once 'db_connect.php'; // Include database connection
 
-// Get appointment ID from URL parameter
-if (isset($_GET['id'])) {
-    $appointmentId = $_GET['id'];
+// Get appointment ID from request body or URL parameter
+$data = json_decode(file_get_contents('php://input'), true);
+$appointmentId = $data['id'] ?? $_GET['id'] ?? null;
 
+if ($appointmentId) {
     try {
         // Prepare SQL to delete the appointment
         $stmt = $pdo->prepare("DELETE FROM appointments WHERE id = :id");

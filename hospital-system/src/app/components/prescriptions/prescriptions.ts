@@ -16,14 +16,16 @@ export class Prescriptions implements OnInit {
   isLoggedIn: boolean = false;
   doctorId: string = '';
   patientName: string = '';
-  patients: any[] = []; 
+  patients: any[] = [];
   medicines: any[] = [];
   filteredMedicines: any[] = [];
+  testResults: any[] = [];
+  filteredTestResults: any[] = [];
+  searchTerm: string = '';
+  selectedTest: any = null;
   prescriptionData = {
     patientId: '',
-    medicine: '',
-    dosage: '',
-    instructions: ''
+    medicines: [{medicine: '', dosage: '', instructions: ''}]
   };
 
   // Success and error messages
@@ -46,6 +48,8 @@ export class Prescriptions implements OnInit {
     } else {
       // Fetch list of medicines
       this.fetchMedicines();
+      // Fetch test results
+      this.fetchTestResults();
     }
   }
 
@@ -69,11 +73,95 @@ export class Prescriptions implements OnInit {
       );
   }
 
-  // Function to filter medicines by name
-  filterMedicines() {
-    if (this.prescriptionData.medicine) {
-      this.filteredMedicines = this.medicines.filter(medicine => 
-        medicine.name.toLowerCase().includes(this.prescriptionData.medicine.toLowerCase())
+  // Fetch test results from the API
+  fetchTestResults(): void {
+    this.isLoading = true; // Set loading to true when fetching data
+    const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/get-test-results.php';  // API URL
+
+    this.http.get<any>(apiUrl).subscribe(
+      (response) => {
+        this.isLoading = false; // Reset loading state when data is fetched
+        if (response.success) {
+          this.testResults = response.testResults.map((test: any) => {
+            // Convert date string to format yyyy-MM-dd
+            test.date = this.formatDate(test.date);
+            return test;
+          });
+          this.filteredTestResults = this.testResults;  // Initially, show all test results
+        } else {
+          this.errorMessage = response.message; // Show error message if API returns failure
+        }
+      },
+      (error) => {
+        this.isLoading = false; // Reset loading state if there's an error
+        this.errorMessage = '❌ Error fetching test results.'; // Display error message
+      }
+    );
+  }
+
+  // Method to format a date string into yyyy-MM-dd format
+  formatDate(date: string): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = ('0' + (d.getMonth() + 1)).slice(-2); // Add leading zero if month is less than 10
+    const day = ('0' + d.getDate()).slice(-2); // Add leading zero if day is less than 10
+    return `${year}-${month}-${day}`;
+  }
+
+  // Method to filter test results based on search term
+  filterResults(): void {
+    if (!this.searchTerm) {
+      this.filteredTestResults = this.testResults; // If searchTerm is empty, show all results
+    } else {
+      this.filteredTestResults = this.testResults.filter((test: any) => {
+        const fullName = `${test.patient_first_name} ${test.patient_last_name} ${test.doctor_first_name} ${test.doctor_last_name} ${test.name}`;
+        return fullName.toLowerCase().includes(this.searchTerm.toLowerCase()); // Case-insensitive match
+      });
+    }
+  }
+
+  // Watch for changes in the search term and filter results accordingly
+  ngDoCheck(): void {
+    this.filterResults(); // Re-filter the results whenever the search term changes
+  }
+
+  // Select a test result to prescribe for
+  selectTest(test: any): void {
+    this.selectedTest = test;
+    this.prescriptionData.patientId = test.patient_id; // Assuming test has patient_id
+  }
+
+  // Cancel prescription form
+  cancel(): void {
+    this.selectedTest = null;
+    this.prescriptionData = {
+      patientId: '',
+      medicines: [{medicine: '', dosage: '', instructions: ''}]
+    };
+  }
+
+  // Add a new medicine entry
+  addMedicine(): void {
+    this.prescriptionData.medicines.push({medicine: '', dosage: '', instructions: ''});
+  }
+
+  // Remove a medicine entry
+  removeMedicine(index: number): void {
+    if (this.prescriptionData.medicines.length > 1) {
+      this.prescriptionData.medicines.splice(index, 1);
+    }
+  }
+
+  // Check if form is valid
+  get isFormValid(): boolean {
+    return !!this.prescriptionData.patientId && this.prescriptionData.medicines.every(med => !!med.medicine && !!med.dosage);
+  }
+
+  // Function to filter medicines by name (for future use)
+  filterMedicines(search: string = '') {
+    if (search) {
+      this.filteredMedicines = this.medicines.filter(medicine =>
+        medicine.name.toLowerCase().includes(search.toLowerCase())
       );
     } else {
       this.filteredMedicines = this.medicines; // If no filter, show all medicines
@@ -81,8 +169,8 @@ export class Prescriptions implements OnInit {
   }
 
   // Function to deduct medicine quantity
-  updateMedicineStock() {
-    const selectedMedicine = this.medicines.find(medicine => medicine.name === this.prescriptionData.medicine);
+  updateMedicineStock(medicineName: string) {
+    const selectedMedicine = this.medicines.find(medicine => medicine.name === medicineName);
     if (selectedMedicine && selectedMedicine.stock_quantity > 0) {
       selectedMedicine.stock_quantity--; // Deduct one unit from the stock
       this.http.post('https://kilnenterprise.com/presbyterian-hospital/update_medicine_stock.php', {
@@ -90,16 +178,14 @@ export class Prescriptions implements OnInit {
         stock_quantity: selectedMedicine.stock_quantity
       }).subscribe(
         (response) => {
-          this.successMessage = 'Medicine stock updated successfully.';
+          // Success, but don't set message here since multiple
         },
         (error) => {
-          this.errorMessage = 'Failed to update medicine stock.';
-          this.successMessage = '';  // Reset success message on error
+          this.errorMessage = 'Failed to update medicine stock for ' + medicineName + '.';
         }
       );
     } else {
-      this.errorMessage = 'Out of stock for the selected medicine.';
-      this.successMessage = '';  // Reset success message
+      this.errorMessage = 'Out of stock for ' + medicineName + '.';
     }
   }
 
@@ -129,45 +215,54 @@ export class Prescriptions implements OnInit {
   }
 
   prescribeMedicine() {
-  // Log the prescription data to ensure it's correct
-  console.log('Prescription Data:', this.prescriptionData); 
+    // Check if all required fields are filled
+    const hasPatient = this.prescriptionData.patientId;
+    const allMedicinesValid = this.prescriptionData.medicines.every(med => med.medicine && med.dosage);
 
-  if (this.prescriptionData.patientId && this.prescriptionData.medicine && this.prescriptionData.dosage) {
-    this.isLoading = true;  // Show loading spinner
+    if (hasPatient && allMedicinesValid) {
+      this.isLoading = true;
+      this.errorMessage = '';
+      this.successMessage = '';
 
-    // Send the request
-    this.http.post('https://kilnenterprise.com/presbyterian-hospital/prescriptions.php', this.prescriptionData)
-      .subscribe(
-        (response) => {
-          // Log the successful response for debugging
-          console.log('Success Response:', response);
+      // Send prescriptions for each medicine
+      let completed = 0;
+      const total = this.prescriptionData.medicines.length;
 
-          // Success logic
-          this.isLoading = false;  // Hide loading spinner
-          this.successMessage = 'Prescription successfully created.';
-          this.errorMessage = '';  // Clear any previous error message
+      this.prescriptionData.medicines.forEach(med => {
+        const prescription = {
+          patientId: this.prescriptionData.patientId,
+          medicine: med.medicine,
+          dosage: med.dosage,
+          instructions: med.instructions
+        };
 
-          // Update medicine stock after successful prescription
-          this.updateMedicineStock();
-        },
-        (error) => {
-          // Log the error for debugging
-          console.error('Error Response:', error);
-
-          // Error logic
-          this.isLoading = false;  // Hide loading spinner
-          if (error.status && error.message) {
-            this.errorMessage = `Error: ${error.status} - ${error.message}`;
-          } else {
-            this.errorMessage = 'An unknown error occurred.';
-          }
-          this.successMessage = '';  // Clear success message on error
-        }
-      );
-  } else {
-    // Validation logic if form fields are empty
-    this.errorMessage = 'All fields must be filled out to prescribe medicine.';
-    this.successMessage = '';  // Reset success message
+        this.http.post('https://kilnenterprise.com/presbyterian-hospital/prescriptions.php', prescription)
+          .subscribe(
+            (response) => {
+              console.log('Success Response:', response);
+              this.updateMedicineStock(med.medicine);
+              completed++;
+              if (completed === total) {
+                this.isLoading = false;
+                this.successMessage = 'All prescriptions successfully created.';
+                this.selectedTest = null;
+              }
+            },
+            (error) => {
+              console.error('Error Response:', error);
+              this.isLoading = false;
+              if (error.status && error.message) {
+                this.errorMessage = `Error for ${med.medicine}: ${error.status} - ${error.message}`;
+              } else {
+                this.errorMessage = `An unknown error occurred for ${med.medicine}.`;
+              }
+              this.successMessage = '';
+            }
+          );
+      });
+    } else {
+      this.errorMessage = 'All fields must be filled out to prescribe medicine.';
+      this.successMessage = '';
+    }
   }
-}
 }

@@ -16,6 +16,13 @@ export class AllAppointments implements OnInit {
   errorMessage: string = '';
   isLoggedIn: boolean = false;  // Variable to hold login status
 
+  // Modal related
+  showDeleteModal: boolean = false;
+  selectedAppointment: any = null;
+
+  // Action loading states
+  isMarkingDone: boolean = false;
+
   constructor(private http: HttpClient, private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
@@ -54,25 +61,59 @@ export class AllAppointments implements OnInit {
   }
 
   // Delete an appointment by ID
-  deleteAppointment(appointmentId: number): void {
-    if (confirm('Are you sure you want to delete this appointment?')) {
-      this.isLoading = true;
-      this.http.delete(`https://kilnenterprise.com/presbyterian-hospital/delete-appointment.php?id=${appointmentId}`)
-        .subscribe({
-          next: (response: any) => {
-            this.isLoading = false;
-            if (response.success) {
-              // Remove the deleted appointment from the local list
-              this.appointments = this.appointments.filter(appointment => appointment.id !== appointmentId);
-            } else {
-              this.errorMessage = 'Failed to delete appointment. Please try again later.';
-            }
-          },
-          error: (err) => {
-            this.isLoading = false;
-            this.errorMessage = 'There was a problem deleting the appointment. Please try again later.';
+  deleteAppointment(appointment: any): void {
+    this.selectedAppointment = appointment;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    const appointmentId = this.selectedAppointment.id;
+    this.closeModals(); // Close modal immediately
+    this.isLoading = true;
+    this.http.delete(`https://kilnenterprise.com/presbyterian-hospital/delete-appointment.php?id=${appointmentId}`)
+      .subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+          if (response.success) {
+            // Remove the deleted appointment from the local list
+            this.appointments = this.appointments.filter(appointment => appointment.id !== appointmentId);
+          } else {
+            this.errorMessage = response.message || 'Failed to delete appointment. Please try again later.';
+            // Re-add the appointment to the list if delete failed
+            this.loadAppointments();
           }
-        });
-    }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = 'There was a problem deleting the appointment. Please try again later.';
+          // Re-add the appointment to the list if delete failed
+          this.loadAppointments();
+        }
+      });
+  }
+
+  closeModals(): void {
+    this.showDeleteModal = false;
+    this.selectedAppointment = null;
+  }
+
+  markAsDone(appointment: any): void {
+    this.isMarkingDone = true;
+    this.http.put(`https://kilnenterprise.com/presbyterian-hospital/update-appointment.php`, { id: appointment.id })
+      .subscribe({
+        next: (response: any) => {
+          this.isMarkingDone = false;
+          if (response.success) {
+            // Remove from current list since it's now completed
+            this.appointments = this.appointments.filter(a => a.id !== appointment.id);
+          } else {
+            this.errorMessage = response.message || 'Failed to mark appointment as done.';
+          }
+        },
+        error: (err) => {
+          this.isMarkingDone = false;
+          this.errorMessage = 'There was a problem updating the appointment.';
+        }
+      });
   }
 }

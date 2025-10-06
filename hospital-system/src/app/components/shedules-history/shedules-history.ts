@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../services/auth';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-shedules-history',
@@ -16,13 +18,19 @@ export class ShedulesHistory implements OnInit {
   isLoading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  isLoggedIn: boolean = false;
 
   private messageTimer: any; // 🔹 Timer for clearing messages
 
-  constructor(private http: HttpClient) {}
+  constructor(private authService: AuthService, private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    this.loadAppointments();
+    this.isLoggedIn = this.authService.loggedIn();
+    if (!this.isLoggedIn){
+      this.router.navigate(['/login']);
+    }else {
+      this.loadAppointments();
+    }
   }
 
   // 🔹 Show message with auto-clear
