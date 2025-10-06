@@ -80,12 +80,17 @@ try {
     }
 
     // Check if the provided department matches the one in the database
-    if ($staff['department'] !== $department) {
-        error_log("DEBUG: Department mismatch for staff_id: $staff_id");
-        http_response_code(401);
-        echo json_encode(["success" => false, "message" => "⚠️ Incorrect department."]);
+    $allowedDepartments = ["administration", "nursing", "Surgery", "Pharmacy", "Pediatrics"];
+
+    if (!in_array(strtolower($staff['department']), $allowedDepartments)) {
+        http_response_code(403);
+        echo json_encode([
+            "success" => false,
+            "message" => "⛔ Access denied. Your department is not authorized."
+        ]);
         exit;
     }
+
 
     // Verify the provided password against the hashed one
     if (!password_verify($password, $staff['password'])) {

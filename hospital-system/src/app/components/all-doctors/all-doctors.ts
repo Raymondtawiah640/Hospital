@@ -15,13 +15,13 @@ import { CommonModule } from '@angular/common';
 export class AllDoctors implements OnInit {
   doctors: any[] = [];
   selectedDoctorSchedules: any[] = [];
-  selectedDoctorId: number = 0;
+  selectedDoctorId: number | null = null;
 
   isLoading: boolean = false;
   errorMessage: string = '';
   isLoggedIn: boolean = false;
 
-  searchTerm: string = ''; // 🔍 New: search input model
+  searchTerm: string = ''; // 🔍 Search input
 
   constructor(
     private http: HttpClient,
@@ -38,13 +38,14 @@ export class AllDoctors implements OnInit {
     }
   }
 
+  // ✅ Load all doctors
   loadDoctors(): void {
     this.isLoading = true;
     this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-doctor.php')
       .subscribe({
         next: (data: any) => {
           this.isLoading = false;
-          if (data.success) {
+          if (data.success && Array.isArray(data.doctors)) {
             this.doctors = data.doctors;
           } else {
             this.errorMessage = 'Failed to load doctor data.';
@@ -58,16 +59,21 @@ export class AllDoctors implements OnInit {
       });
   }
 
+  // ✅ Load schedules for a doctor and check if attendance is done
   loadDoctorSchedules(doctorId: number): void {
     this.isLoading = true;
     this.http.get(`https://kilnenterprise.com/presbyterian-hospital/get-schedule.php?doctorId=${doctorId}`)
       .subscribe({
         next: (data: any) => {
           this.isLoading = false;
-          if (data.success) {
-            this.selectedDoctorSchedules = data.schedules;
+          if (data.success && Array.isArray(data.schedules)) {
+            this.selectedDoctorSchedules = data.schedules.map((schedule: any) => ({
+              ...schedule,
+              is_attended: schedule.is_attended === 1 // Ensure boolean flag
+            }));
           } else {
-            this.errorMessage = 'Failed to load schedules for the selected doctor.';
+            this.selectedDoctorSchedules = [];
+            this.errorMessage = 'No schedules available for this doctor.';
           }
         },
         error: (err) => {
@@ -78,17 +84,48 @@ export class AllDoctors implements OnInit {
       });
   }
 
+  // ✅ Handle doctor dropdown change
   onDoctorChange(event: any): void {
-    const selectedDoctorId = event.target.value;
-    this.selectedDoctorId = selectedDoctorId;
-    if (selectedDoctorId) {
-      this.loadDoctorSchedules(selectedDoctorId);
+    const selectedDoctorId = Number(event.target.value);
+    this.selectedDoctorId = selectedDoctorId || null;
+
+    if (this.selectedDoctorId) {
+      this.loadDoctorSchedules(this.selectedDoctorId);
     } else {
       this.selectedDoctorSchedules = [];
     }
   }
 
-  // 🔍 Getter to filter doctors based on search term
+  // ✅ Mark attendance and disable button
+  markAttendance(schedule: any): void {
+    if (!this.selectedDoctorId) return;
+
+    const payload = {
+      doctor_id: this.selectedDoctorId,
+      schedule_id: schedule.id
+    };
+
+    this.isLoading = true;
+    this.http.post('https://kilnenterprise.com/presbyterian-hospital/save-attendance.php', payload)
+      .subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          if (res.success) {
+            alert('✅ Attendance marked successfully!');
+            schedule.is_attended = true; // Disable button locally
+          } else {
+            alert('⚠️ ' + res.message);
+          }
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error('Error marking attendance:', err);
+          alert('❌ Failed to mark attendance. Please try again.');
+        }
+      });
+  }
+
+  // 🔍 Filter doctors by search term
   get filteredDoctors(): any[] {
     const term = this.searchTerm.toLowerCase();
     return this.doctors.filter(doctor =>

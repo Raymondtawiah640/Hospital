@@ -24,6 +24,8 @@ import { Prescriptions } from './components/prescriptions/prescriptions';
 import { Schedules } from './components/schedules/schedules';   
 import { TestResults } from './components/test-results/test-results';
 import { Login } from './components/login/login';
+import { Profile } from './components/profile/profile';
+import { ShedulesHistory } from './components/shedules-history/shedules-history';   
 
 export const routes: Routes = [
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // default route
@@ -52,5 +54,7 @@ export const routes: Routes = [
     {path: 'schedules', component: Schedules},
     {path: 'test-results', component: TestResults},
     {path: 'login', component: Login},
+    {path: 'profile', component: Profile},
+    {path: 'history', component: ShedulesHistory},
     { path: '**', redirectTo: '/dashboard' }
 ];

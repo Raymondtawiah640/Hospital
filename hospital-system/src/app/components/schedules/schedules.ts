@@ -9,13 +9,17 @@ import { CommonModule } from '@angular/common';
   selector: 'app-schedules',
   templateUrl: './schedules.html',
   styleUrls: ['./schedules.css'],
-  imports: [FormsModule, CommonModule]  // Ensure FormsModule and CommonModule are imported
+  imports: [FormsModule, CommonModule]
 })
 export class Schedules implements OnInit {
   doctors: any[] = [];
+  filteredDoctors: any[] = [];
+  searchTerm: string = '';
+
   scheduleData = {
-    doctorId: 0,  // Set default value as 0 (number)
+    doctorId: '',   // ✅ start empty, no 0
     day: '',
+    date: '',
     startTime: '',
     endTime: '',
     department: ''
@@ -24,35 +28,34 @@ export class Schedules implements OnInit {
   isLoading: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
-  isLoggedIn: boolean = false;  // To store login status
+  isLoggedIn: boolean = false;
 
   constructor(
-    private http: HttpClient, 
+    private http: HttpClient,
     private router: Router,
-    private authService: AuthService  // Inject AuthService
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    // Check if the user is logged in
     this.isLoggedIn = this.authService.loggedIn();
-    
-    // If not logged in, redirect to login page
+
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     } else {
-      this.loadDoctors();  // Load doctors on component initialization
+      this.loadDoctors();
     }
   }
 
   // Load doctor data
   loadDoctors(): void {
     this.isLoading = true;
-    this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-doctor.php') // Endpoint to get doctor list
+    this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-doctor.php')
       .subscribe({
         next: (data: any) => {
           this.isLoading = false;
           if (data.success) {
-            this.doctors = data.doctors;  // Store the list of doctors
+            this.doctors = data.doctors;
+            this.filteredDoctors = [...this.doctors]; // copy to filtered
           } else {
             this.errorMessage = 'Failed to load doctor data.';
           }
@@ -65,17 +68,23 @@ export class Schedules implements OnInit {
       });
   }
 
-  // Handle form submission for adding schedule
-  onSubmit(): void {
+  // Filter doctors by search term
+  filterDoctors(): void {
+    const term = this.searchTerm.toLowerCase();
+    this.filteredDoctors = this.doctors.filter(doc =>
+      (`${doc.first_name} ${doc.last_name}`).toLowerCase().includes(term)
+    );
+  }
+
+  // Handle form submission
+  onSubmit(scheduleForm: any): void {
     this.errorMessage = '';
     this.successMessage = '';
     this.isLoading = true;
 
-    // Ensure doctorId is a number before sending it to the server
-    this.scheduleData.doctorId = +this.scheduleData.doctorId;  // Convert to number using unary plus
-
-    if (this.scheduleData.doctorId && this.scheduleData.day && this.scheduleData.startTime && this.scheduleData.endTime && this.scheduleData.department) {
-      // Send data as POST request to add schedule
+    if (this.scheduleData.doctorId && this.scheduleData.day &&
+        this.scheduleData.startTime && this.scheduleData.endTime &&
+        this.scheduleData.department) {
       this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-schedule.php', this.scheduleData, {
         headers: { 'Content-Type': 'application/json' }
       }).subscribe({
@@ -83,6 +92,22 @@ export class Schedules implements OnInit {
           this.isLoading = false;
           if (response.success) {
             this.successMessage = 'Schedule added successfully!';
+
+            // ✅ Reset form
+            scheduleForm.resetForm();
+            this.scheduleData = {
+              doctorId: '',
+              day: '',
+              date: '',
+              startTime: '',
+              endTime: '',
+              department: ''
+            };
+
+            // ✅ Auto clear success message after 3s
+            setTimeout(() => {
+              this.successMessage = '';
+            }, 3000);
           } else {
             this.errorMessage = response.message || 'Failed to add schedule.';
           }

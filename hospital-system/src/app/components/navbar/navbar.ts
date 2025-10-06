@@ -51,19 +51,17 @@ export class Navbar {
     this.openDropdown = null;
   }
 
-  // Logout
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
-    this.navigateAndClose();
-  }
-
   // Auth helpers
   get isLoggedIn(): boolean {
     return this.auth.loggedIn();
   }
 
-  get staffName(): string {
-    return this.auth.getStaff()?.full_name || '';
-  }
+  getDepartment(): string | null {
+  return localStorage.getItem('department');
+}
+
+isAdmin(): boolean {
+  return this.getDepartment() === 'Administration';
+}
+
 }

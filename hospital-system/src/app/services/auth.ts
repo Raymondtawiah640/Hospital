@@ -39,12 +39,15 @@ export class AuthService {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
       tap(response => {
-        console.log('DEBUG: Response from backend:', response);
-        if (response.success && response.staff) {
-          localStorage.setItem('staff', JSON.stringify(response.staff));
-          this.loggedIn.set(true);
-        }
-      }),
+      console.log('DEBUG: Response from backend:', response);
+      if (response.success && response.staff) {
+        localStorage.setItem('staff', JSON.stringify(response.staff));
+        this.loggedIn.set(true);
+
+        // ✅ Store department separately for quick checks
+        localStorage.setItem('department', response.staff.department);
+      }
+    }),
       catchError(err => {
         console.error('Login error:', err);
         return throwError(() => new Error('Login failed. Please try again.'));
