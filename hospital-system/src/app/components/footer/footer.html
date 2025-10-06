@@ -1,91 +1,51 @@
 <!-- footer.component.html -->
 <footer class="bg-blue-900 text-white py-10">
-  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
 
-    <!-- Grid Links Section -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-
-      <!-- About Section -->
-      <div class="space-y-3">
-        <img src="logo.png" alt="Hospital Logo" class="w-16 h-16 rounded-full mx-auto md:mx-0">
-        <p class="text-gray-300 leading-relaxed text-center md:text-left text-sm">
-          Providing trusted healthcare services with advanced facilities, professional doctors, and compassionate care for every patient.
-        </p>
-      </div>
-
-      <!-- Patients & Doctors Links (Collapsible on Mobile) -->
-      <div class="md:block">
-        <h2 class="text-xl font-bold text-red-400 mb-2 flex justify-between md:block cursor-pointer" 
-            (click)="toggleSection('patients')">
-          Patients & Doctors
-          <span class="md:hidden">{{ openSection === 'patients' ? '−' : '+' }}</span>
-        </h2>
-        <ul [ngClass]="{'hidden md:block': openSection !== 'patients'}" class="space-y-1 text-sm">
-          <li><a routerLink="/all-patients" class="hover:text-green-400 transition duration-200">All Patients</a></li>
-          <li><a routerLink="/add-patient" class="hover:text-green-400 transition duration-200">Add Patient</a></li>
-          <li><a routerLink="/patient-records" class="hover:text-green-400 transition duration-200">Patient Records</a></li>
-          <li><a routerLink="/all-doctors" class="hover:text-green-400 transition duration-200">All Doctors</a></li>
-          <li><a routerLink="/add-doctor" class="hover:text-green-400 transition duration-200">Add Doctor</a></li>
-          <li><a routerLink="/schedules" class="hover:text-green-400 transition duration-200">Schedules</a></li>
-        </ul>
-      </div>
-
-      <!-- Services Links -->
-      <div class="md:block">
-        <h2 class="text-xl font-bold text-red-400 mb-2 flex justify-between md:block cursor-pointer"
-            (click)="toggleSection('services')">
-          Services
-          <span class="md:hidden">{{ openSection === 'services' ? '−' : '+' }}</span>
-        </h2>
-        <ul [ngClass]="{'hidden md:block': openSection !== 'services'}" class="space-y-1 text-sm">
-          <li><a routerLink="/all-appointments" class="hover:text-green-400 transition duration-200">All Appointments</a></li>
-          <li><a routerLink="/book-appointment" class="hover:text-green-400 transition duration-200">Book Appointment</a></li>
-          <li><a routerLink="/appointment-history" class="hover:text-green-400 transition duration-200">Appointment History</a></li>
-          <li><a routerLink="/laboratory-tests" class="hover:text-green-400 transition duration-200">Laboratory Tests</a></li>
-          <li><a routerLink="/test-results" class="hover:text-green-400 transition duration-200">Test Results</a></li>
-          <li><a routerLink="/pharmacy-stock" class="hover:text-green-400 transition duration-200">Pharmacy Stock</a></li>
-          <li><a routerLink="/prescriptions" class="hover:text-green-400 transition duration-200">Prescriptions</a></li>
-          <li><a routerLink="/medical-records" class="hover:text-green-400 transition duration-200">Medical Records</a></li>
-        </ul>
-      </div>
-
-      <!-- Departments & Reports -->
-      <div class="md:block">
-        <h2 class="text-xl font-bold text-red-400 mb-2 flex justify-between md:block cursor-pointer"
-            (click)="toggleSection('departments')">
-          Departments & Reports
-          <span class="md:hidden">{{ openSection === 'departments' ? '−' : '+' }}</span>
-        </h2>
-        <ul [ngClass]="{'hidden md:block': openSection !== 'departments'}" class="space-y-1 text-sm">
-          <li><a routerLink="/general-department" class="hover:text-green-400 transition duration-200">General Department</a></li>
-          <li><a routerLink="/cardiology" class="hover:text-green-400 transition duration-200">Cardiology</a></li>
-          <li><a routerLink="/pediatrics" class="hover:text-green-400 transition duration-200">Pediatrics</a></li>
-          <li><a routerLink="/emergency" class="hover:text-green-400 transition duration-200">Emergency</a></li>
-          <li><a routerLink="/daily-reports" class="hover:text-green-400 transition duration-200">Daily Reports</a></li>
-          <li><a routerLink="/monthly-reports" class="hover:text-green-400 transition duration-200">Monthly Reports</a></li>
-          <li><a routerLink="/annual-reports" class="hover:text-green-400 transition duration-200">Annual Reports</a></li>
-          <li><a routerLink="/billing" class="hover:text-green-400 transition duration-200">Billing</a></li>
-          <li><a routerLink="/invoices" class="hover:text-green-400 transition duration-200">Invoices</a></li>
-          <li><a routerLink="/login" class="hover:text-green-400 transition duration-200">Login</a></li>
-        </ul>
-      </div>
-
+    <!-- Logo & Description -->
+    <div class="flex flex-col items-center space-y-4">
+      <img src="logo.png" alt="Hospital Logo" class="w-16 h-16 rounded-full">
+      <p class="text-gray-300 leading-relaxed text-sm max-w-xl">
+        Providing trusted healthcare services with advanced facilities, professional doctors, and compassionate care for every patient.
+      </p>
     </div>
 
     <!-- Contact Section -->
-    <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-10 text-gray-300">
-      <div>
-        <h2 class="text-xl font-bold text-green-400 mb-4">Contact Us</h2>
-        <ul class="space-y-2 text-sm">
-          <li class="flex items-center"><span class="mr-2">📍</span>123 Main Street, City, Country</li>
-          <li class="flex items-center"><span class="mr-2">📞</span>+123 456 7890</li>
-          <li class="flex items-center"><span class="mr-2">✉️</span>contact@hospital.com</li>
-        </ul>
-      </div>
+    <div class="mt-10">
+      <h2 class="text-xl font-bold text-green-400 mb-4">Contact Us</h2>
+      <ul class="flex items-center justify-center space-x-8 text-gray-300 text-2xl">
+        <!-- Location (no link) -->
+        <li class="relative group cursor-pointer">
+          <i class="fas fa-map-marker-alt text-green-400"></i>
+          <span class="absolute bottom-full mb-2 w-max opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+            123 Main Street, City, Country
+          </span>
+        </li>
+
+        <!-- Phone -->
+        <li class="relative group cursor-pointer">
+          <a href="tel:+1234567890">
+            <i class="fas fa-phone-alt text-green-400"></i>
+          </a>
+          <span class="absolute bottom-full mb-2 w-max opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+            +123 456 7890
+          </span>
+        </li>
+
+        <!-- Email -->
+        <li class="relative group cursor-pointer">
+          <a href="mailto:contact@hospital.com">
+            <i class="fas fa-envelope text-green-400"></i>
+          </a>
+          <span class="absolute bottom-full mb-2 w-max opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2">
+            contact@hospital.com
+          </span>
+        </li>
+      </ul>
     </div>
 
     <!-- Bottom Footer -->
-    <div class="border-t border-gray-700 mt-10 pt-4 text-center text-gray-400 text-sm">
+    <div class="border-t border-gray-700 mt-10 pt-4 text-gray-400 text-sm">
       <p>&copy; <span id="year"></span> <span class="text-white font-semibold">Hospital System</span>. All Rights Reserved.</p>
     </div>
   </div>
