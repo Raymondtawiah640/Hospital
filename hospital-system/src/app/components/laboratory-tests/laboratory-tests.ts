@@ -129,7 +129,7 @@ export class LaboratoryTests implements OnInit {
   // Method to add a new test via API
   addLabTest(): void {
     this.isLoading = true; // Set loading to true when starting the submission
-    
+
     // Ensure newTest.date is a Date object and format it to 'YYYY-MM-DD'
     const formattedDate = new Date(this.newTest.date).toISOString().split('T')[0];
 
@@ -138,7 +138,7 @@ export class LaboratoryTests implements OnInit {
       name: this.newTest.name,
       patientId: this.newTest.patient,
       doctor: this.newTest.doctor,
-      date: formattedDate, 
+      date: formattedDate,
       status: this.newTest.status,
       type: this.newTest.type
     };

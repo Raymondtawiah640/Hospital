@@ -66,12 +66,15 @@ export class AddPatient implements OnInit {
               this.message = '✅ Patient added successfully';
               setTimeout(() => location.reload(), 1000); // Show message briefly
             } else {
-              this.message = response.message || '❌ Incomplete data. Please fill all required fields.';
+              this.message = '❌ ' + JSON.stringify(response);
+              setTimeout(() => {
+                this.message = '';
+              }, 3000);
             }
           },
           error: () => {
             this.isLoading = false; // Stop loading on error
-            this.message = '❌ There was an issue saving the patient. Please try again later.';
+            this.message = '❌ Make sure all fields are not empty';
           }
         });
       }

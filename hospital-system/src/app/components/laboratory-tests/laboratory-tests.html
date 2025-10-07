@@ -10,12 +10,12 @@
   </div>
 
   <!-- Form for Adding Laboratory Test -->
-  <form (ngSubmit)="addLabTest()">
+  <form (ngSubmit)="addLabTest()" #labForm="ngForm">
     <div class="space-y-4">
       
       <!-- Test Name -->
       <div>
-        <label class="block text-sm font-medium text-gray-700">Test Name</label>
+        <label class="block text-sm font-medium text-gray-700">Test Name <span [class.text-red-500]="!newTest.name" [class.text-green-500]="newTest.name">*</span></label>
         <input [(ngModel)]="newTest.name" name="name" required class="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter test name" />
       </div>
 
@@ -27,7 +27,7 @@
 
       <!-- Patient Dropdown -->
       <div>
-        <label class="block text-sm font-medium text-gray-700">Patient</label>
+        <label class="block text-sm font-medium text-gray-700">Patient <span [class.text-red-500]="!newTest.patient" [class.text-green-500]="newTest.patient">*</span></label>
         <select [(ngModel)]="newTest.patient" name="patient" required class="w-full p-2 border border-gray-300 rounded-md">
           <option value="" disabled selected>Select patient</option>
           <option *ngFor="let patient of filteredPatients" [value]="patient.id">
@@ -44,7 +44,7 @@
 
       <!-- Doctor Dropdown -->
       <div>
-        <label class="block text-sm font-medium text-gray-700">Doctor</label>
+        <label class="block text-sm font-medium text-gray-700">Doctor <span [class.text-red-500]="!newTest.doctor" [class.text-green-500]="newTest.doctor">*</span></label>
         <select [(ngModel)]="newTest.doctor" name="doctor" required class="w-full p-2 border border-gray-300 rounded-md">
           <option value="" disabled selected>Select doctor</option>
           <option *ngFor="let doctor of filteredDoctors" [value]="doctor.id">
@@ -55,13 +55,13 @@
 
       <!-- Date -->
       <div>
-        <label class="block text-sm font-medium text-gray-700">Date</label>
+        <label class="block text-sm font-medium text-gray-700">Date <span [class.text-red-500]="!newTest.date" [class.text-green-500]="newTest.date">*</span></label>
         <input [(ngModel)]="newTest.date" name="date" type="date" required class="w-full p-2 border border-gray-300 rounded-md" />
       </div>
 
       <!-- Status -->
       <div>
-        <label class="block text-sm font-medium text-gray-700">Status</label>
+        <label class="block text-sm font-medium text-gray-700">Status <span [class.text-red-500]="!newTest.status" [class.text-green-500]="newTest.status">*</span></label>
         <select [(ngModel)]="newTest.status" name="status" required class="w-full p-2 border border-gray-300 rounded-md">
           <option value="Pending">Pending</option>
           <option value="Completed">Completed</option>
@@ -76,7 +76,7 @@
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" [disabled]="isLoading" class="bg-blue-600 text-white px-6 py-2 rounded-md mt-4">
+      <button type="submit" [disabled]="!labForm.form.valid || isLoading" [class.cursor-not-allowed]="!labForm.form.valid || isLoading" [class.bg-gray-400]="!labForm.form.valid" [class.bg-blue-600]="labForm.form.valid" class="text-white px-6 py-2 rounded-md mt-4 disabled:opacity-60">
         <span *ngIf="isLoading">
           <!-- SVG Spinner (loading indicator) -->
           <svg class="animate-spin h-5 w-5 text-white mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

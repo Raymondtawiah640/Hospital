@@ -22,8 +22,8 @@
 
     <!-- Patient Dropdown -->
     <div class="mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Select a Patient:</h3>
-      <select id="patient" name="patient" [(ngModel)]="scheduleData.patientId" required
+      <h3 class="text-lg font-semibold text-gray-800">Select a Patient: <span [class.text-red-500]="!patient?.value" [class.text-green-500]="patient?.value">*</span></h3>
+      <select #patient="ngModel" id="patient" name="patient" [(ngModel)]="patient.value" required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 p-2">
         <option value="">-- Select Patient --</option>
         <option *ngFor="let patient of filteredPatients" [value]="patient.id">
@@ -41,8 +41,8 @@
 
     <!-- Doctor Dropdown -->
     <div class="mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Select a Doctor:</h3>
-      <select id="doctor" name="doctor" [(ngModel)]="scheduleData.doctorId" required
+      <h3 class="text-lg font-semibold text-gray-800">Select a Doctor: <span [class.text-red-500]="!doctor?.value" [class.text-green-500]="doctor?.value">*</span></h3>
+      <select #doctor="ngModel" id="doctor" name="doctor" [(ngModel)]="doctor.value" required
               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 p-2">
         <option value="">-- Select Doctor --</option>
         <option *ngFor="let doctor of filteredDoctors" [value]="doctor.id">
@@ -53,8 +53,8 @@
 
     <!-- Reason for Appointment -->
     <div class="mb-4">
-      <h3 class="text-lg font-semibold text-gray-800">Reason for Appointment:</h3>
-      <textarea id="reason" name="reason" [(ngModel)]="scheduleData.reason" rows="4" placeholder="Describe symptoms or reason..."
+      <h3 class="text-lg font-semibold text-gray-800">Reason for Appointment: <span [class.text-red-500]="!reason?.value" [class.text-green-500]="reason?.value">*</span></h3>
+      <textarea #reason="ngModel" id="reason" name="reason" [(ngModel)]="reason.value" rows="4" placeholder="Describe symptoms or reason..."
                 required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 p-2"></textarea>
     </div>
 
@@ -62,8 +62,8 @@
     <form (ngSubmit)="onSubmit()" class="space-y-6">
       <!-- Department -->
       <div>
-        <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
-        <select id="department" name="department" [(ngModel)]="scheduleData.department" required
+        <label for="department" class="block text-sm font-medium text-gray-700">Department <span [class.text-red-500]="!department?.value" [class.text-green-500]="department?.value">*</span></label>
+        <select #department="ngModel" id="department" name="department" [(ngModel)]="department.value" required
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 p-2">
           <option value="">-- Select Department --</option>
           <option>General Medicine</option>
@@ -79,14 +79,14 @@
       <!-- Date & Time -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label for="date" class="block text-sm font-medium text-gray-700">Preferred Date</label>
-          <input type="date" id="date" name="date" [(ngModel)]="scheduleData.date" required
+          <label for="date" class="block text-sm font-medium text-gray-700">Preferred Date <span [class.text-red-500]="!date?.value" [class.text-green-500]="date?.value">*</span></label>
+          <input #date="ngModel" type="date" id="date" name="date" [(ngModel)]="date.value" required
                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 p-2"/>
         </div>
 
         <div>
-          <label for="time" class="block text-sm font-medium text-gray-700">Preferred Time</label>
-          <input type="time" id="time" name="time" [(ngModel)]="scheduleData.time" required
+          <label for="time" class="block text-sm font-medium text-gray-700">Preferred Time <span [class.text-red-500]="!time?.value" [class.text-green-500]="time?.value">*</span></label>
+          <input #time="ngModel" type="time" id="time" name="time" [(ngModel)]="time.value" required
                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-300 p-2"/>
         </div>
       </div>

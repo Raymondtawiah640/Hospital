@@ -67,10 +67,14 @@ export class AddDoctor implements OnInit {
               this.successMessage = `${this.doctorData.role.charAt(0).toUpperCase() + this.doctorData.role.slice(1)} added successfully!`;
               this.resetForm();
               setTimeout(() => {
+                this.successMessage = '';
                 this.router.navigate([`/add-${this.doctorData.role}`]);
               }, 1500);
             } else {
               this.errorMessage = response.message || 'An error occurred while adding the user.';
+              setTimeout(() => {
+                this.errorMessage = '';
+              }, 3000);
             }
           },
           error: (err) => {

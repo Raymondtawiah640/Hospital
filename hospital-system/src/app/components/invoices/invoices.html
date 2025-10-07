@@ -113,18 +113,50 @@
 
   <!-- View Invoice Modal -->
   <div *ngIf="showViewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+    <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-screen overflow-y-auto">
       <h2 class="text-xl font-bold mb-4">Invoice Details</h2>
-      <div *ngIf="selectedInvoice" class="space-y-2">
-        <p><strong>Invoice Number:</strong> {{ selectedInvoice.invoice_number }}</p>
-        <p><strong>Patient:</strong> {{ selectedInvoice.patient_name }}</p>
-        <p><strong>Doctor:</strong> {{ selectedInvoice.doctor_name }}</p>
-        <p><strong>Amount:</strong> ${{ selectedInvoice.amount }}</p>
-        <p><strong>Date:</strong> {{ selectedInvoice.date }}</p>
-        <p><strong>Status:</strong> <span [ngClass]="getStatusClass(selectedInvoice.status)">{{ selectedInvoice.status | titlecase }}</span></p>
+      <div *ngIf="selectedInvoice" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p><strong>Invoice Number:</strong> {{ selectedInvoice.invoice_number }}</p>
+            <p><strong>Patient:</strong> {{ selectedInvoice.patient_name }}</p>
+            <p><strong>Doctor:</strong> {{ selectedInvoice.doctor_name }}</p>
+          </div>
+          <div>
+            <p><strong>Amount:</strong> ${{ selectedInvoice.amount }}</p>
+            <p><strong>Date:</strong> {{ selectedInvoice.date }}</p>
+            <p><strong>Status:</strong> <span [ngClass]="getStatusClass(selectedInvoice.status)">{{ selectedInvoice.status | titlecase }}</span></p>
+          </div>
+        </div>
+
+        <!-- Prescribed Medications -->
+        <div class="mt-6">
+          <h3 class="text-lg font-semibold mb-3">Prescribed Medications</h3>
+          <div *ngIf="prescriptions.length > 0" class="overflow-x-auto">
+            <table class="min-w-full bg-white border border-gray-300">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Medication</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Dosage</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">Instructions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr *ngFor="let prescription of prescriptions" class="hover:bg-gray-50">
+                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ prescription.medicine_name || prescription.name }}</td>
+                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900">{{ prescription.dosage }}</td>
+                  <td class="px-4 py-2 text-sm text-gray-900">{{ prescription.instructions }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="prescriptions.length === 0" class="text-gray-500 italic">
+            No medications prescribed for this patient.
+          </div>
+        </div>
       </div>
-      <div class="flex justify-end space-x-2 mt-4">
-        <button (click)="printInvoice()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Print</button>
+      <div class="flex justify-end space-x-2 mt-6">
+        <button (click)="printInvoice()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Print Invoice</button>
         <button (click)="closeModals()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Close</button>
       </div>
     </div>

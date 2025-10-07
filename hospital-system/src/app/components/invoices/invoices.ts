@@ -37,6 +37,7 @@ export class Invoices implements OnInit, OnDestroy {
   showViewModal: boolean = false;
   showDeleteModal: boolean = false;
   selectedInvoice: any = null;
+  prescriptions: any[] = [];
 
   constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
 
@@ -159,7 +160,26 @@ export class Invoices implements OnInit, OnDestroy {
 
   viewInvoice(invoice: any): void {
     this.selectedInvoice = invoice;
+    this.fetchPrescriptions(invoice.patient_name);
     this.showViewModal = true;
+  }
+
+  fetchPrescriptions(patientName: string): void {
+    const apiUrl = `https://kilnenterprise.com/presbyterian-hospital/prescriptions.php?patient_name=${encodeURIComponent(patientName)}`;
+    this.http.get<any>(apiUrl).subscribe(
+      (response) => {
+        if (Array.isArray(response) && response.length > 0 && response[0].prescriptions) {
+          this.prescriptions = response[0].prescriptions;
+        } else if (response.success && response.prescriptions) {
+          this.prescriptions = response.prescriptions;
+        } else {
+          this.prescriptions = [];
+        }
+      },
+      (error) => {
+        this.prescriptions = [];
+      }
+    );
   }
 
   deleteInvoice(invoice: any): void {
@@ -189,29 +209,97 @@ export class Invoices implements OnInit, OnDestroy {
 
   printInvoice(): void {
     if (this.selectedInvoice) {
+      const prescriptionsHtml = this.prescriptions.length > 0
+        ? `<h3 style="margin-top: 30px; color: #333;">Prescribed Medications</h3>
+           <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+             <thead>
+               <tr style="background-color: #f0f0f0;">
+                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Medication</th>
+                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Dosage</th>
+                 <th style="border: 1px solid #ddd; padding: 8px; text-align: left;">Instructions</th>
+               </tr>
+             </thead>
+             <tbody>
+               ${this.prescriptions.map(p => `
+                 <tr>
+                   <td style="border: 1px solid #ddd; padding: 8px;">${p.medicine_name || p.name}</td>
+                   <td style="border: 1px solid #ddd; padding: 8px;">${p.dosage}</td>
+                   <td style="border: 1px solid #ddd; padding: 8px;">${p.instructions}</td>
+                 </tr>
+               `).join('')}
+             </tbody>
+           </table>`
+        : '<p style="margin-top: 30px; color: #666;">No medications prescribed.</p>';
+
       const printContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ccc;">
-          <h1 style="text-align: center; color: #333;">Presbyterian Hospital</h1>
-          <h2 style="text-align: center;">Invoice</h2>
-          <div style="margin: 20px 0;">
-            <p><strong>Invoice Number:</strong> ${this.selectedInvoice.invoice_number}</p>
-            <p><strong>Patient Name:</strong> ${this.selectedInvoice.patient_name}</p>
-            <p><strong>Doctor Name:</strong> ${this.selectedInvoice.doctor_name}</p>
-            <p><strong>Amount:</strong> $${this.selectedInvoice.amount}</p>
-            <p><strong>Date:</strong> ${this.selectedInvoice.date}</p>
-            <p><strong>Status:</strong> ${this.selectedInvoice.status}</p>
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; border: 2px solid #333; background: white;">
+          <header style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
+            <h1 style="color: #2c3e50; margin: 0; font-size: 28px;">Presbyterian Hospital</h1>
+            <p style="color: #7f8c8d; margin: 5px 0; font-size: 14px;">Quality Healthcare Services</p>
+            <p style="color: #7f8c8d; margin: 0; font-size: 12px;">123 Medical Center Drive, Healthcare City</p>
+          </header>
+
+          <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+            <div>
+              <h2 style="color: #2c3e50; margin: 0 0 10px 0;">Invoice Details</h2>
+              <p style="margin: 5px 0;"><strong>Invoice Number:</strong> ${this.selectedInvoice.invoice_number}</p>
+              <p style="margin: 5px 0;"><strong>Date:</strong> ${this.selectedInvoice.date}</p>
+              <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: ${this.getStatusColor(this.selectedInvoice.status)};">${this.selectedInvoice.status.toUpperCase()}</span></p>
+            </div>
+            <div>
+              <h2 style="color: #2c3e50; margin: 0 0 10px 0;">Patient Information</h2>
+              <p style="margin: 5px 0;"><strong>Name:</strong> ${this.selectedInvoice.patient_name}</p>
+              <p style="margin: 5px 0;"><strong>Doctor:</strong> ${this.selectedInvoice.doctor_name}</p>
+            </div>
           </div>
-          <div style="text-align: center; margin-top: 40px;">
-            <p>Thank you for choosing Presbyterian Hospital</p>
+
+          <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 30px;">
+            <h3 style="color: #2c3e50; margin: 0 0 15px 0;">Payment Summary</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 16px; font-weight: bold;">Total Amount:</span>
+              <span style="font-size: 24px; font-weight: bold; color: #e74c3c;">$${this.selectedInvoice.amount}</span>
+            </div>
           </div>
+
+          ${prescriptionsHtml}
+
+          <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #7f8c8d;">
+            <p style="margin: 5px 0;">Thank you for choosing Presbyterian Hospital</p>
+            <p style="margin: 5px 0; font-size: 12px;">For inquiries, contact us at (555) 123-4567 or info@presbyterianhospital.com</p>
+            <p style="margin: 5px 0; font-size: 10px;">This is a computer-generated invoice and does not require a signature.</p>
+          </footer>
         </div>
       `;
       const printWindow = window.open('', '_blank');
       if (printWindow) {
-        printWindow.document.write(printContent);
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>Invoice - ${this.selectedInvoice.invoice_number}</title>
+              <style>
+                @media print {
+                  body { margin: 0; }
+                  .no-print { display: none; }
+                }
+              </style>
+            </head>
+            <body>
+              ${printContent}
+            </body>
+          </html>
+        `);
         printWindow.document.close();
         printWindow.print();
       }
+    }
+  }
+
+  private getStatusColor(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'paid': return '#27ae60';
+      case 'pending': return '#f39c12';
+      case 'overdue': return '#e74c3c';
+      default: return '#7f8c8d';
     }
   }
 
