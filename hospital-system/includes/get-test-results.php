@@ -15,14 +15,15 @@ if (!isset($pdo)) {
 
 try {
     // SQL query to fetch the test results from the database
-    $stmt = $pdo->prepare("SELECT lab.id, 
-                                  lab.name, 
-                                  p.first_name AS patient_first_name, 
-                                  p.last_name AS patient_last_name, 
-                                  d.first_name AS doctor_first_name, 
-                                  d.last_name AS doctor_last_name, 
-                                  lab.date, 
-                                  lab.status, 
+    $stmt = $pdo->prepare("SELECT lab.id,
+                                  lab.patient_id,
+                                  lab.name,
+                                  p.first_name AS patient_first_name,
+                                  p.last_name AS patient_last_name,
+                                  d.first_name AS doctor_first_name,
+                                  d.last_name AS doctor_last_name,
+                                  lab.date,
+                                  lab.status,
                                   lab.type
                            FROM laboratory_tests lab
                            LEFT JOIN patients p ON lab.patient_id = p.id

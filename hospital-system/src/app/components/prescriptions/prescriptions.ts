@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth';  // Ensure you have the AuthService
@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms'; // <-- Import FormsModule
   standalone: true,
   imports: [CommonModule, FormsModule]  // <-- Add FormsModule here
 })
-export class Prescriptions implements OnInit {
+export class Prescriptions implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
   doctorId: string = '';
   patientName: string = '';
@@ -32,12 +32,45 @@ export class Prescriptions implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
   isLoading: boolean = false; // Loading flag
+  private messageTimer: any;
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private authService: AuthService  // <-- Inject AuthService
   ) {}
+
+  // Method to set success message with auto-hide
+  private setSuccessMessage(message: string): void {
+    this.successMessage = message;
+    this.errorMessage = ''; // Clear error message
+    this.clearMessageAfterDelay();
+  }
+
+  // Method to set error message with auto-hide
+  private setErrorMessage(message: string): void {
+    this.errorMessage = message;
+    this.successMessage = ''; // Clear success message
+    this.clearMessageAfterDelay();
+  }
+
+  // Method to clear messages after 5 seconds
+  private clearMessageAfterDelay(): void {
+    if (this.messageTimer) {
+      clearTimeout(this.messageTimer);
+    }
+    this.messageTimer = setTimeout(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }, 5000); // 5 seconds
+  }
+
+  // Clear timer when component is destroyed
+  ngOnDestroy(): void {
+    if (this.messageTimer) {
+      clearTimeout(this.messageTimer);
+    }
+  }
 
   ngOnInit() {
     // Check if the doctor is logged in
@@ -58,18 +91,16 @@ export class Prescriptions implements OnInit {
     this.http.get<any[]>('https://kilnenterprise.com/presbyterian-hospital/medicines.php')
       .subscribe(
         (data) => {
-          if (data && Array.isArray(data) && data.length > 0) {
-            this.medicines = data;
-            this.filteredMedicines = data;  // Initialize filtered medicines with all medicines
-          } else {
-            this.errorMessage = 'No medicines found.';
-            this.successMessage = '';  // Reset success message if no medicines
-          }
-        },
-        (error) => {
-          this.errorMessage = 'Failed to fetch medicines. Please check the network or API.';
-          this.successMessage = '';  // Reset success message on error
-        }
+           if (data && Array.isArray(data) && data.length > 0) {
+             this.medicines = data;
+             this.filteredMedicines = data;  // Initialize filtered medicines with all medicines
+           } else {
+             this.setErrorMessage('No medicines found.');
+           }
+         },
+         (error) => {
+           this.setErrorMessage('Failed to fetch medicines. Please check the network or API.');
+         }
       );
   }
 
@@ -82,20 +113,20 @@ export class Prescriptions implements OnInit {
       (response) => {
         this.isLoading = false; // Reset loading state when data is fetched
         if (response.success) {
-          this.testResults = response.testResults.map((test: any) => {
-            // Convert date string to format yyyy-MM-dd
-            test.date = this.formatDate(test.date);
-            return test;
-          });
-          this.filteredTestResults = this.testResults;  // Initially, show all test results
-        } else {
-          this.errorMessage = response.message; // Show error message if API returns failure
-        }
-      },
-      (error) => {
-        this.isLoading = false; // Reset loading state if there's an error
-        this.errorMessage = '❌ Error fetching test results.'; // Display error message
-      }
+           this.testResults = response.testResults.map((test: any) => {
+             // Convert date string to format yyyy-MM-dd
+             test.date = this.formatDate(test.date);
+             return test;
+           });
+           this.filteredTestResults = this.testResults;  // Initially, show all test results
+         } else {
+           this.setErrorMessage(response.message); // Show error message if API returns failure
+         }
+       },
+       (error) => {
+         this.isLoading = false; // Reset loading state if there's an error
+         this.setErrorMessage('❌ Error fetching test results.'); // Display error message
+       }
     );
   }
 
@@ -181,11 +212,11 @@ export class Prescriptions implements OnInit {
           // Success, but don't set message here since multiple
         },
         (error) => {
-          this.errorMessage = 'Failed to update medicine stock for ' + medicineName + '.';
+          this.setErrorMessage('Failed to update medicine stock for ' + medicineName + '.');
         }
       );
     } else {
-      this.errorMessage = 'Out of stock for ' + medicineName + '.';
+      this.setErrorMessage('Out of stock for ' + medicineName + '.');
     }
   }
 
@@ -197,20 +228,15 @@ export class Prescriptions implements OnInit {
           (data) => {
             this.patients = data;
             if (data.length === 0) {
-              this.errorMessage = 'No patients found with that name.';
-              this.successMessage = '';  // Reset success message
-            } else {
-              this.successMessage = '';  // Reset success message
+              this.setErrorMessage('No patients found with that name.');
             }
           },
           (error) => {
-            this.errorMessage = 'Failed to search patients.';
-            this.successMessage = '';  // Reset success message
+            this.setErrorMessage('Failed to search patients.');
           }
         );
     } else {
-      this.errorMessage = 'Please enter a patient name to search.';
-      this.successMessage = '';  // Reset success message
+      this.setErrorMessage('Please enter a patient name to search.');
     }
   }
 
@@ -221,8 +247,6 @@ export class Prescriptions implements OnInit {
 
     if (hasPatient && allMedicinesValid) {
       this.isLoading = true;
-      this.errorMessage = '';
-      this.successMessage = '';
 
       // Send prescriptions for each medicine
       let completed = 0;
@@ -244,25 +268,29 @@ export class Prescriptions implements OnInit {
               completed++;
               if (completed === total) {
                 this.isLoading = false;
-                this.successMessage = 'All prescriptions successfully created.';
+                this.setSuccessMessage('All prescriptions successfully created.');
+                // Remove the test from the lists to prevent re-prescribing
+                if (this.selectedTest) {
+                  this.testResults = this.testResults.filter(test => test.id !== this.selectedTest.id);
+                  this.filteredTestResults = this.filteredTestResults.filter(test => test.id !== this.selectedTest.id);
+                }
                 this.selectedTest = null;
+                this.cancel(); // Reset form
               }
             },
             (error) => {
               console.error('Error Response:', error);
               this.isLoading = false;
               if (error.status && error.message) {
-                this.errorMessage = `Error for ${med.medicine}: ${error.status} - ${error.message}`;
+                this.setErrorMessage(`Error for ${med.medicine}: ${error.status} - ${error.message}`);
               } else {
-                this.errorMessage = `An unknown error occurred for ${med.medicine}.`;
+                this.setErrorMessage(`An unknown error occurred for ${med.medicine}.`);
               }
-              this.successMessage = '';
             }
           );
       });
     } else {
-      this.errorMessage = 'All fields must be filled out to prescribe medicine.';
-      this.successMessage = '';
+      this.setErrorMessage('All fields must be filled out to prescribe medicine.');
     }
   }
 }
