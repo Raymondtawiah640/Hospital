@@ -89,26 +89,6 @@ export class DailyReports implements OnInit, OnDestroy {
       (error) => {
         this.isLoading = false;
         this.setErrorMessage('Error generating report.');
-        // Mock data for demonstration
-        this.reportData = {
-          totalPatients: 15,
-          totalLabTests: 28,
-          totalPrescriptions: 23,
-          totalBills: 18,
-          totalRevenue: 1250.75,
-          labTests: [
-            { patient_name: 'John Doe', doctor_name: 'Dr. Smith', test_name: 'Blood Test', status: 'completed', type: 'Routine' },
-            { patient_name: 'Jane Smith', doctor_name: 'Dr. Johnson', test_name: 'X-Ray', status: 'pending', type: 'Diagnostic' }
-          ],
-          prescriptions: [
-            { patient_name: 'John Doe', doctor_name: 'Dr. Smith', medicines: 2 },
-            { patient_name: 'Jane Smith', doctor_name: 'Dr. Johnson', medicines: 1 }
-          ],
-          bills: [
-            { patient_name: 'John Doe', amount: 150.00, status: 'paid' },
-            { patient_name: 'Jane Smith', amount: 75.50, status: 'pending' }
-          ]
-        };
       }
     );
   }

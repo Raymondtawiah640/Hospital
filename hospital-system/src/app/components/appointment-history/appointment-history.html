@@ -38,7 +38,7 @@
           <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.patient_name }} {{ appointment.patient_lastname }}</td>
           <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.doctor_name }} {{ appointment.doctor_lastname }}</td>
           <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.department }}</td>
-          <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.date }}</td>
+          <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.date | date:'mediumDate' }}</td>
           <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.time }}</td>
           <td class="px-6 py-4 text-sm text-gray-800">{{ appointment.reason }}</td>
           <td class="px-6 py-4 text-sm text-gray-800">
