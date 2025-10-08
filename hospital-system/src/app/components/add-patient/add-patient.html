@@ -12,36 +12,36 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- First Name -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">First Name <span [class.text-red-500]="!firstName?.value" [class.text-green-500]="firstName?.value">*</span></label>
-          <input #firstName="ngModel" type="text" [(ngModel)]="firstName.value" name="firstName" placeholder="Enter first name"
+          <label class="block text-gray-700 font-semibold mb-2">First Name <span [class.text-red-500]="!firstNameModel?.valid" [class.text-green-500]="firstNameModel?.valid">*</span></label>
+          <input #firstNameModel="ngModel" type="text" [(ngModel)]="firstName" name="firstName" placeholder="Enter first name"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
 
         <!-- Last Name -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Last Name <span [class.text-red-500]="!lastName?.value" [class.text-green-500]="lastName?.value">*</span></label>
-          <input #lastName="ngModel" type="text" [(ngModel)]="lastName.value" name="lastName" placeholder="Enter last name"
+          <label class="block text-gray-700 font-semibold mb-2">Last Name <span [class.text-red-500]="!lastNameModel?.valid" [class.text-green-500]="lastNameModel?.valid">*</span></label>
+          <input #lastNameModel="ngModel" type="text" [(ngModel)]="lastName" name="lastName" placeholder="Enter last name"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
 
         <!-- Ghana Card Number -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Ghana Card Number <span [class.text-red-500]="!ghanaCardNumber?.value" [class.text-green-500]="ghanaCardNumber?.value">*</span></label>
-          <input #ghanaCardNumber="ngModel" type="text" [(ngModel)]="ghanaCardNumber.value" name="ghanaCardNumber" placeholder="GHA-XXXXXXXXX-X"
+          <label class="block text-gray-700 font-semibold mb-2">Ghana Card Number <span [class.text-red-500]="!ghanaCardNumberModel?.valid" [class.text-green-500]="ghanaCardNumberModel?.valid">*</span></label>
+          <input #ghanaCardNumberModel="ngModel" type="text" [(ngModel)]="ghanaCardNumber" name="ghanaCardNumber" placeholder="GHA-XXXXXXXXX-X"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
 
         <!-- Date of Birth -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Date of Birth <span [class.text-red-500]="!dateOfBirth?.value" [class.text-green-500]="dateOfBirth?.value">*</span></label>
-          <input #dateOfBirth="ngModel" type="date" [(ngModel)]="dateOfBirth.value" name="dateOfBirth"
+          <label class="block text-gray-700 font-semibold mb-2">Date of Birth <span [class.text-red-500]="!dateOfBirthModel?.valid" [class.text-green-500]="dateOfBirthModel?.valid">*</span></label>
+          <input #dateOfBirthModel="ngModel" type="date" [(ngModel)]="dateOfBirth" name="dateOfBirth"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
 
         <!-- Gender -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Gender <span [class.text-red-500]="!gender?.value" [class.text-green-500]="gender?.value">*</span></label>
-          <select #gender="ngModel" [(ngModel)]="gender.value" name="gender"
+          <label class="block text-gray-700 font-semibold mb-2">Gender <span [class.text-red-500]="!genderModel?.valid" [class.text-green-500]="genderModel?.valid">*</span></label>
+          <select #genderModel="ngModel" [(ngModel)]="gender" name="gender"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
             <option value="">Select gender</option>
             <option>Male</option>
@@ -52,8 +52,8 @@
 
         <!-- Blood Group -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Blood Group <span [class.text-red-500]="!bloodGroup?.value" [class.text-green-500]="bloodGroup?.value">*</span></label>
-          <select #bloodGroup="ngModel" [(ngModel)]="bloodGroup.value" name="bloodGroup"
+          <label class="block text-gray-700 font-semibold mb-2">Blood Group <span [class.text-red-500]="!bloodGroupModel?.valid" [class.text-green-500]="bloodGroupModel?.valid">*</span></label>
+          <select #bloodGroupModel="ngModel" [(ngModel)]="bloodGroup" name="bloodGroup"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
             <option value="">Select blood group</option>
             <option>A+</option>
@@ -73,22 +73,22 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Phone -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Phone Number <span [class.text-red-500]="!phoneNumber?.value" [class.text-green-500]="phoneNumber?.value">*</span></label>
-          <input #phoneNumber="ngModel" type="tel" [(ngModel)]="phoneNumber.value" name="phoneNumber" placeholder="+233 24 123 4567"
+          <label class="block text-gray-700 font-semibold mb-2">Phone Number <span [class.text-red-500]="!phoneNumberModel?.valid" [class.text-green-500]="phoneNumberModel?.valid">*</span></label>
+          <input #phoneNumberModel="ngModel" type="tel" [(ngModel)]="phoneNumber" name="phoneNumber" placeholder="+233 24 123 4567"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
 
         <!-- Email -->
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Email <span [class.text-red-500]="!email?.value" [class.text-green-500]="email?.value">*</span></label>
-          <input #email="ngModel" type="email" [(ngModel)]="email.value" name="email" placeholder="patient@example.com"
+          <label class="block text-gray-700 font-semibold mb-2">Email <span [class.text-red-500]="!emailModel?.valid" [class.text-green-500]="emailModel?.valid">*</span></label>
+          <input #emailModel="ngModel" type="email" [(ngModel)]="email" name="email" placeholder="patient@example.com"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
 
         <!-- Address -->
         <div class="md:col-span-2">
-          <label class="block text-gray-700 font-semibold mb-2">Residential Address <span [class.text-red-500]="!residentialAddr?.value" [class.text-green-500]="residentialAddr?.value">*</span></label>
-          <textarea #residentialAddr="ngModel" rows="2" [(ngModel)]="residentialAddr.value" name="residentialAddr" placeholder="Enter address"
+          <label class="block text-gray-700 font-semibold mb-2">Residential Address <span [class.text-red-500]="!residentialAddrModel?.valid" [class.text-green-500]="residentialAddrModel?.valid">*</span></label>
+          <textarea #residentialAddrModel="ngModel" rows="2" [(ngModel)]="residentialAddr" name="residentialAddr" placeholder="Enter address"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></textarea>
         </div>
       </div>
@@ -97,13 +97,13 @@
       <h3 class="text-xl font-semibold text-blue-800 mt-8 mb-4">Emergency Contact</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Name <span [class.text-red-500]="!emergencyName?.value" [class.text-green-500]="emergencyName?.value">*</span></label>
-          <input #emergencyName="ngModel" type="text" [(ngModel)]="emergencyName.value" name="emergencyName" placeholder="Emergency contact name"
+          <label class="block text-gray-700 font-semibold mb-2">Name <span [class.text-red-500]="!emergencyNameModel?.valid" [class.text-green-500]="emergencyNameModel?.valid">*</span></label>
+          <input #emergencyNameModel="ngModel" type="text" [(ngModel)]="emergencyName" name="emergencyName" placeholder="Emergency contact name"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
         <div>
-          <label class="block text-gray-700 font-semibold mb-2">Phone Number <span [class.text-red-500]="!emergencyPhone?.value" [class.text-green-500]="emergencyPhone?.value">*</span></label>
-          <input #emergencyPhone="ngModel" type="tel" [(ngModel)]="emergencyPhone.value" name="emergencyPhone" placeholder="+233 20 987 6543"
+          <label class="block text-gray-700 font-semibold mb-2">Phone Number <span [class.text-red-500]="!emergencyPhoneModel?.valid" [class.text-green-500]="emergencyPhoneModel?.valid">*</span></label>
+          <input #emergencyPhoneModel="ngModel" type="tel" [(ngModel)]="emergencyPhone" name="emergencyPhone" placeholder="+233 20 987 6543"
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
         </div>
       </div>

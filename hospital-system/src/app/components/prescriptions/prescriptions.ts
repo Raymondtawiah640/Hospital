@@ -14,6 +14,7 @@ import { FormsModule } from '@angular/forms'; // <-- Import FormsModule
 })
 export class Prescriptions implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
+  department: string = '';
   doctorId: string = '';
   patientName: string = '';
   patients: any[] = [];
@@ -27,6 +28,11 @@ export class Prescriptions implements OnInit, OnDestroy {
     patientId: '',
     medicines: [{medicine: '', dosage: '', instructions: ''}]
   };
+
+
+  // Track prescribing state
+  prescribingTests: Set<number> = new Set();
+  prescribedTests: Set<number> = new Set();
 
   // Success and error messages
   successMessage: string = '';
@@ -73,15 +79,18 @@ export class Prescriptions implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Check if the doctor is logged in
-    this.isLoggedIn = this.authService.loggedIn(); // Use AuthService to check login status
+    // Check if logged in
+    this.isLoggedIn = this.authService.loggedIn();
 
     if (!this.isLoggedIn) {
-      this.router.navigate(['/login']);  // Redirect to login page if not logged in
+      this.router.navigate(['/login']);
     } else {
-      // Fetch list of medicines
+      // Load prescribed tests from localStorage
+      const stored = localStorage.getItem('prescribedTests');
+      if (stored) {
+        this.prescribedTests = new Set(JSON.parse(stored));
+      }
       this.fetchMedicines();
-      // Fetch test results
       this.fetchTestResults();
     }
   }
@@ -151,15 +160,12 @@ export class Prescriptions implements OnInit, OnDestroy {
     }
   }
 
-  // Watch for changes in the search term and filter results accordingly
-  ngDoCheck(): void {
-    this.filterResults(); // Re-filter the results whenever the search term changes
-  }
 
   // Select a test result to prescribe for
   selectTest(test: any): void {
     this.selectedTest = test;
     this.prescriptionData.patientId = test.patient_id; // Assuming test has patient_id
+    this.prescribingTests.add(test.id);
   }
 
   // Cancel prescription form
@@ -269,11 +275,9 @@ export class Prescriptions implements OnInit, OnDestroy {
               if (completed === total) {
                 this.isLoading = false;
                 this.setSuccessMessage('All prescriptions successfully created.');
-                // Remove the test from the lists to prevent re-prescribing
-                if (this.selectedTest) {
-                  this.testResults = this.testResults.filter(test => test.id !== this.selectedTest.id);
-                  this.filteredTestResults = this.filteredTestResults.filter(test => test.id !== this.selectedTest.id);
-                }
+                this.prescribedTests.add(this.selectedTest.id);
+                localStorage.setItem('prescribedTests', JSON.stringify([...this.prescribedTests]));
+                this.prescribingTests.delete(this.selectedTest.id);
                 this.selectedTest = null;
                 this.cancel(); // Reset form
               }
@@ -281,6 +285,7 @@ export class Prescriptions implements OnInit, OnDestroy {
             (error) => {
               console.error('Error Response:', error);
               this.isLoading = false;
+              this.prescribingTests.delete(this.selectedTest.id);
               if (error.status && error.message) {
                 this.setErrorMessage(`Error for ${med.medicine}: ${error.status} - ${error.message}`);
               } else {
@@ -292,5 +297,10 @@ export class Prescriptions implements OnInit, OnDestroy {
     } else {
       this.setErrorMessage('All fields must be filled out to prescribe medicine.');
     }
+  }
+
+
+  ngDoCheck(): void {
+    this.filterResults();
   }
 }

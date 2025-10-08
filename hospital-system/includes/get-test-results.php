@@ -14,7 +14,7 @@ if (!isset($pdo)) {
 }
 
 try {
-    // SQL query to fetch the test results from the database
+    // SQL query to fetch the test results from the database, excluding patients who already have prescriptions
     $stmt = $pdo->prepare("SELECT lab.id,
                                   lab.patient_id,
                                   lab.name,
@@ -27,7 +27,10 @@ try {
                                   lab.type
                            FROM laboratory_tests lab
                            LEFT JOIN patients p ON lab.patient_id = p.id
-                           LEFT JOIN doctors d ON lab.doctor = d.id");
+                           LEFT JOIN doctors d ON lab.doctor = d.id
+                           WHERE lab.patient_id NOT IN (
+                               SELECT DISTINCT patient_id FROM prescriptions
+                           )");
 
     // Execute the query
     $stmt->execute();

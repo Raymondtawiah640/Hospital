@@ -74,7 +74,7 @@ export class AddPatient implements OnInit {
           },
           error: () => {
             this.isLoading = false; // Stop loading on error
-            this.message = '❌ Make sure all fields are not empty';
+            // Removed error message display
           }
         });
       }

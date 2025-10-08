@@ -13,24 +13,20 @@ import { Router } from '@angular/router';
   imports: [CommonModule, FormsModule]
 })
 export class PharmacyStock implements OnInit {
+  // Prescription management
+  prescriptions: any[] = [];
+  filteredPrescriptions: any[] = [];
+  bills: any[] = [];
+
+  // Medicine management
   medicines: any[] = [];
   filteredMedicines: any[] = [];
-  isLoading: boolean = false;
-  errorMessage: string = '';
-  searchTerm: string = '';
-  isLoggedIn: boolean = false;
-
-  // Summary counts
   totalMedicines: number = 0;
   inStockCount: number = 0;
   outOfStockCount: number = 0;
-
-  // Pagination
   currentPage: number = 1;
   totalPages: number = 1;
   itemsPerPage: number = 10;
-
-  // Form related
   showForm: boolean = false;
   isEditing: boolean = false;
   currentMedicine: any = {
@@ -40,13 +36,43 @@ export class PharmacyStock implements OnInit {
     stock_quantity: 0,
     description: ''
   };
+  selectedMedicine: any = null;
+
+  // Common properties
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
+  searchTerm: string = '';
+  isLoggedIn: boolean = false;
 
   // Modal related
   showViewModal: boolean = false;
   showDeleteModal: boolean = false;
-  selectedMedicine: any = null;
+  selectedPrescription: any = null;
 
   constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
+
+  // Method to set success message with auto-hide
+  private setSuccessMessage(message: string): void {
+    this.successMessage = message;
+    this.errorMessage = '';
+    this.clearMessageAfterDelay();
+  }
+
+  // Method to set error message with auto-hide
+  private setErrorMessage(message: string): void {
+    this.errorMessage = message;
+    this.successMessage = '';
+    this.clearMessageAfterDelay();
+  }
+
+  // Method to clear messages after 5 seconds
+  private clearMessageAfterDelay(): void {
+    setTimeout(() => {
+      this.successMessage = '';
+      this.errorMessage = '';
+    }, 5000);
+  }
 
   ngOnInit(): void {
     this.isLoggedIn = this.authService.loggedIn();
@@ -54,10 +80,115 @@ export class PharmacyStock implements OnInit {
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     } else {
+      this.fetchPrescriptionsForPharmacist();
+      this.fetchBills();
       this.fetchMedicines();
     }
   }
 
+
+  // Pharmacist methods
+  fetchPrescriptionsForPharmacist(): void {
+    this.isLoading = true;
+    const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/prescriptions.php?all=true';
+    this.http.get<any[]>(apiUrl).subscribe(
+      (response) => {
+        this.isLoading = false;
+        this.prescriptions = response || [];
+        this.filteredPrescriptions = this.prescriptions;
+      },
+      (error) => {
+        this.isLoading = false;
+        this.setErrorMessage('Failed to fetch prescriptions');
+      }
+    );
+  }
+
+  fetchBills(): void {
+    const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/billing.php?page=1&limit=1000';
+    this.http.get<any>(apiUrl).subscribe(
+      (response) => {
+        if (Array.isArray(response)) {
+          this.bills = response;
+        } else if (response.bills && Array.isArray(response.bills)) {
+          this.bills = response.bills;
+        } else {
+          this.bills = [];
+        }
+      },
+      (error) => {
+        this.setErrorMessage('Failed to fetch bills');
+      }
+    );
+  }
+
+  getPaymentStatus(patientName: string): string {
+    const bill = this.bills.find(b => b.patient_name === patientName);
+    return bill ? bill.status : 'Not Billed';
+  }
+
+  getPaymentStatusClass(status: string): string {
+    switch (status) {
+      case 'paid': return 'text-green-600 font-semibold';
+      case 'pending': return 'text-yellow-600 font-semibold';
+      case 'overdue': return 'text-red-600 font-semibold';
+      default: return 'text-gray-600 font-semibold';
+    }
+  }
+
+  viewPrescription(prescription: any): void {
+    this.selectedPrescription = prescription;
+    this.showViewModal = true;
+  }
+
+  deletePrescription(prescription: any): void {
+    this.selectedPrescription = prescription;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/prescriptions.php';
+    this.http.delete<any>(apiUrl, { body: { id: this.selectedPrescription.prescriptions[0].id } }).subscribe(
+      (response) => {
+        if (response.success) {
+          this.fetchPrescriptionsForPharmacist();
+          this.closeModals();
+          this.setSuccessMessage('Prescription deleted successfully');
+        } else {
+          this.setErrorMessage(response.message);
+          this.closeModals();
+        }
+      },
+      (error) => {
+        this.setErrorMessage('Error deleting prescription');
+        this.closeModals();
+      }
+    );
+  }
+
+  closeModals(): void {
+    this.showViewModal = false;
+    this.showDeleteModal = false;
+    this.selectedPrescription = null;
+  }
+
+  filterPrescriptions(): void {
+    if (!this.searchTerm) {
+      this.filteredPrescriptions = this.prescriptions;
+    } else {
+      this.filteredPrescriptions = this.prescriptions.filter((prescription: any) => {
+        const searchStr = `${prescription.patient_name} ${prescription.doctor_name}`.toLowerCase();
+        return searchStr.includes(this.searchTerm.toLowerCase());
+      });
+    }
+  }
+
+  ngDoCheck(): void {
+    this.filterPrescriptions();
+    this.filterMedicines();
+  }
+
+  // Medicine management methods
   fetchMedicines(page: number = 1): void {
     this.isLoading = true;
     const apiUrl = `https://kilnenterprise.com/presbyterian-hospital/medicines.php?page=${page}&limit=${this.itemsPerPage}`;
@@ -66,7 +197,6 @@ export class PharmacyStock implements OnInit {
       (response) => {
         this.isLoading = false;
         if (Array.isArray(response)) {
-          // Old format: direct array
           this.medicines = response;
           this.currentPage = 1;
           this.totalPages = 1;
@@ -74,7 +204,6 @@ export class PharmacyStock implements OnInit {
           this.calculateSummary();
           this.filteredMedicines = this.medicines;
         } else if (response.medicines && Array.isArray(response.medicines)) {
-          // New format: with pagination
           this.medicines = response.medicines;
           this.currentPage = response.pagination.currentPage;
           this.totalPages = response.pagination.totalPages;
@@ -107,14 +236,6 @@ export class PharmacyStock implements OnInit {
         return searchStr.includes(this.searchTerm.toLowerCase());
       });
     }
-  }
-
-  ngDoCheck(): void {
-    this.filterResults();
-  }
-
-  filterResults(): void {
-    this.filterMedicines();
   }
 
   getStatus(quantity: number): string {
@@ -163,12 +284,14 @@ export class PharmacyStock implements OnInit {
         if (response.success) {
           this.fetchMedicines();
           this.showForm = false;
+          this.setSuccessMessage('Medicine added successfully');
         } else {
-          this.errorMessage = response.message;
+          // Remove error message display
+          console.error('Error adding medicine:', response.message);
         }
       },
       (error) => {
-        this.errorMessage = 'Error adding medicine.';
+        console.error('Error adding medicine:', error);
       }
     );
   }
@@ -180,12 +303,13 @@ export class PharmacyStock implements OnInit {
         if (response.success) {
           this.fetchMedicines();
           this.showForm = false;
+          this.setSuccessMessage('Medicine updated successfully');
         } else {
-          this.errorMessage = response.message;
+          this.setErrorMessage(response.message);
         }
       },
       (error) => {
-        this.errorMessage = 'Error updating medicine.';
+        this.setErrorMessage('Error updating medicine.');
       }
     );
   }
@@ -195,21 +319,22 @@ export class PharmacyStock implements OnInit {
     this.showDeleteModal = true;
   }
 
-  confirmDelete(): void {
+  confirmDeleteMedicine(): void {
     const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/delete-medicine.php';
     this.http.delete<any>(apiUrl, { body: { id: this.selectedMedicine.id } }).subscribe(
       (response) => {
         if (response.success) {
           this.fetchMedicines();
-          this.closeModals();
+          this.closeMedicineModals();
+          this.setSuccessMessage('Medicine deleted successfully');
         } else {
-          this.errorMessage = response.message;
-          this.closeModals();
+          this.setErrorMessage(response.message);
+          this.closeMedicineModals();
         }
       },
       (error) => {
-        this.errorMessage = 'Error deleting medicine.';
-        this.closeModals();
+        this.setErrorMessage('Error deleting medicine.');
+        this.closeMedicineModals();
       }
     );
   }
@@ -218,7 +343,7 @@ export class PharmacyStock implements OnInit {
     this.showForm = false;
   }
 
-  closeModals(): void {
+  closeMedicineModals(): void {
     this.showViewModal = false;
     this.showDeleteModal = false;
     this.selectedMedicine = null;
@@ -236,3 +361,4 @@ export class PharmacyStock implements OnInit {
     }
   }
 }
+

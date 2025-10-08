@@ -378,7 +378,16 @@ export class Billing implements OnInit, OnDestroy {
     this.http.post<any>(apiUrl, billData).subscribe(
       (response) => {
         if (response.success) {
-          this.fetchBills();
+          // Add the new bill to the local array immediately
+          const newBill = {
+            ...billData,
+            id: response.id || Date.now(), // Use response id if available, otherwise temporary id
+            status: 'pending'
+          };
+          this.bills.unshift(newBill); // Add to beginning of array
+          this.filteredBills = this.bills; // Update filtered bills
+          this.calculateSummary(); // Recalculate summary counts
+
           // Delete the prescriptions from database after successful billing
           this.deletePrescriptionsForPatient(this.selectedPrescription.patient_id);
           this.prescriptions = this.prescriptions.filter((p: any) => p.patient_id !== this.selectedPrescription.patient_id);
@@ -396,9 +405,51 @@ export class Billing implements OnInit, OnDestroy {
   }
 
   deletePrescriptionsForPatient(patientId: number): void {
-    // Assuming there's an endpoint to delete prescriptions by patient_id
-    // For now, since no such endpoint, we'll just remove from frontend
-    // In a real implementation, you'd call an API to delete them
+    const prescriptionsToDelete = this.prescriptions.filter(p => p.patient_id === patientId);
+    prescriptionsToDelete.forEach(prescription => {
+      prescription.prescriptions.forEach((med: any) => {
+        // First, restore the medicine stock
+        this.restoreMedicineStock(med.medicine_id);
+        // Then delete the prescription
+        const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/prescriptions.php';
+        this.http.delete<any>(apiUrl, { body: { id: med.id } }).subscribe(
+          (response) => {
+            if (!response.success) {
+              console.error('Failed to delete prescription:', med.id);
+            }
+          },
+          (error) => {
+            console.error('Error deleting prescription:', error);
+          }
+        );
+      });
+    });
+  }
+
+  restoreMedicineStock(medicineId: number): void {
+    // First, fetch the current stock
+    const fetchUrl = `https://kilnenterprise.com/presbyterian-hospital/medicines.php?id=${medicineId}`;
+    this.http.get<any[]>(fetchUrl).subscribe(
+      (medicines) => {
+        if (medicines && medicines.length > 0) {
+          const medicine = medicines[0];
+          const newStock = medicine.stock_quantity + 1;
+          // Now update the stock
+          const updateUrl = 'https://kilnenterprise.com/presbyterian-hospital/update_medicine_stock.php';
+          this.http.post(updateUrl, { id: medicineId, stock_quantity: newStock }).subscribe(
+            (response) => {
+              // Success, stock restored
+            },
+            (error) => {
+              console.error('Error updating medicine stock:', error);
+            }
+          );
+        }
+      },
+      (error) => {
+        console.error('Error fetching medicine:', error);
+      }
+    );
   }
 
   prevPage(): void {

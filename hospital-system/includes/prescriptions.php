@@ -1,7 +1,7 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST");
+header("Access-Control-Allow-Methods: GET, POST, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 include 'db_connect.php';
@@ -14,6 +14,7 @@ try {
             // Fetch prescriptions with medicine details and prices
             $patient_id = isset($_GET['patient_id']) ? $_GET['patient_id'] : null;
             $patient_name = isset($_GET['patient_name']) ? $_GET['patient_name'] : null;
+            $all = isset($_GET['all']) ? $_GET['all'] : null;
 
             $sql = "SELECT prescriptions.id, prescriptions.doctor_id, prescriptions.patient_id,
                            prescriptions.dosage, prescriptions.instructions,
@@ -74,8 +75,8 @@ try {
                 $grouped_prescriptions[$patient_id]['total_amount'] += $prescription['price'];
             }
 
-            // Filter out prescriptions for patients who already have bills only when no specific patient_id is requested
-            if (!$patient_id) {
+            // Filter out prescriptions for patients who already have bills only when no specific patient_id is requested and not all
+            if (!$patient_id && !$all) {
                 $filtered_prescriptions = array_filter($grouped_prescriptions, function($prescription) use ($pdo) {
                     $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM bills WHERE patient_name = ?");
                     $stmt->execute([$prescription['patient_name']]);
@@ -84,7 +85,7 @@ try {
                 });
                 echo json_encode(array_values($filtered_prescriptions));
             } else {
-                // For specific patient requests (like viewing invoice), return all prescriptions
+                // For specific patient requests or all, return all prescriptions
                 echo json_encode(array_values($grouped_prescriptions));
             }
             break;
@@ -128,6 +129,27 @@ try {
             ]);
 
             echo json_encode(['success' => true, 'message' => 'Prescription created successfully']);
+            break;
+
+        case 'DELETE':
+            // Delete prescription
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            if (!$data || !isset($data['id'])) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Prescription ID required']);
+                exit;
+            }
+
+            $stmt = $pdo->prepare("DELETE FROM prescriptions WHERE id = ?");
+            $stmt->execute([$data['id']]);
+
+            if ($stmt->rowCount() > 0) {
+                echo json_encode(['success' => true, 'message' => 'Prescription deleted successfully']);
+            } else {
+                http_response_code(404);
+                echo json_encode(['success' => false, 'message' => 'Prescription not found']);
+            }
             break;
 
         default:
