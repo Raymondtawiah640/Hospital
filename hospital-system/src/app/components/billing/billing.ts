@@ -182,6 +182,10 @@ export class Billing implements OnInit, OnDestroy {
     });
   }
 
+  hasBill(patientName: string): boolean {
+    return this.bills.some(bill => bill.patient_name === patientName);
+  }
+
   calculateSummary(): void {
     this.totalBills = this.bills.length;
     this.paidBills = this.bills.filter(b => b.status === 'paid').length;
@@ -388,8 +392,7 @@ export class Billing implements OnInit, OnDestroy {
           this.filteredBills = this.bills; // Update filtered bills
           this.calculateSummary(); // Recalculate summary counts
 
-          // Delete the prescriptions from database after successful billing
-          this.deletePrescriptionsForPatient(this.selectedPrescription.patient_id);
+          // Prescriptions are not deleted, just filtered out since patient now has a bill
           this.prescriptions = this.prescriptions.filter((p: any) => p.patient_id !== this.selectedPrescription.patient_id);
           this.filteredPrescriptions = this.filteredPrescriptions.filter((p: any) => p.patient_id !== this.selectedPrescription.patient_id);
           this.closeModals();

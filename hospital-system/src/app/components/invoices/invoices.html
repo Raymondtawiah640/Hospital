@@ -79,7 +79,7 @@
           <td class="px-4 py-2">{{ invoice.invoice_number }}</td>
           <td class="px-4 py-2">{{ invoice.patient_name }}</td>
           <td class="px-4 py-2">{{ invoice.doctor_name }}</td>
-          <td class="px-4 py-2">${{ invoice.amount }}</td>
+          <td class="px-4 py-2">GH₵{{ invoice.amount }}</td>
           <td class="px-4 py-2">{{ invoice.date }}</td>
           <td class="px-4 py-2">
             <span [ngClass]="getStatusClass(invoice.status)">{{ invoice.status | titlecase }}</span>
@@ -123,7 +123,7 @@
             <p><strong>Doctor:</strong> {{ selectedInvoice.doctor_name }}</p>
           </div>
           <div>
-            <p><strong>Amount:</strong> ${{ selectedInvoice.amount }}</p>
+            <p><strong>Amount:</strong> GH₵{{ selectedInvoice.amount }}</p>
             <p><strong>Date:</strong> {{ selectedInvoice.date }}</p>
             <p><strong>Status:</strong> <span [ngClass]="getStatusClass(selectedInvoice.status)">{{ selectedInvoice.status | titlecase }}</span></p>
           </div>

@@ -234,7 +234,8 @@
             <p class="text-2xl font-bold text-green-600">${{ prescription.total_amount }}</p>
             <p class="text-sm text-gray-600">{{ prescription.prescriptions?.length || 0 }} medicine(s)</p>
             <button (click)="generateBillFromPrescription(prescription)"
-              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm mt-2">
+              [disabled]="hasBill(prescription.patient_name)"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm mt-2 disabled:bg-gray-400 disabled:cursor-not-allowed">
               Generate Bill
             </button>
           </div>
@@ -259,7 +260,7 @@
                   </div>
                 </div>
                 <div class="text-right ml-4">
-                  <div class="text-xl font-bold text-green-600">${{ med.price }}</div>
+                  <div class="text-xl font-bold text-green-600">GH₵{{ med.price }}</div>
                   <div class="text-sm text-gray-500">Stock: {{ med.stock_quantity }}</div>
                   <div class="text-xs text-gray-400">Medicine ID: {{ med.medicine_id }}</div>
                 </div>
@@ -270,7 +271,7 @@
           <div class="mt-4 pt-3 border-t border-gray-200">
             <div class="flex justify-between items-center">
               <span class="font-medium text-gray-700">Total Amount:</span>
-              <span class="text-xl font-bold text-green-600">${{ prescription.total_amount }}</span>
+              <span class="text-xl font-bold text-green-600">GH₵{{ prescription.total_amount }}</span>
             </div>
           </div>
         </div>

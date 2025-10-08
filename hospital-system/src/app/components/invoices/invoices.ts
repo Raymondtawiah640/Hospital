@@ -257,7 +257,7 @@ export class Invoices implements OnInit, OnDestroy {
             <h3 style="color: #2c3e50; margin: 0 0 15px 0;">Payment Summary</h3>
             <div style="display: flex; justify-content: space-between; align-items: center;">
               <span style="font-size: 16px; font-weight: bold;">Total Amount:</span>
-              <span style="font-size: 24px; font-weight: bold; color: #e74c3c;">$${this.selectedInvoice.amount}</span>
+              <span style="font-size: 24px; font-weight: bold; color: #e74c3c;">GH₵${this.selectedInvoice.amount}</span>
             </div>
           </div>
 

@@ -152,7 +152,7 @@
         <tbody class="divide-y divide-gray-200">
           <tr *ngFor="let medicine of filteredMedicines">
             <td class="px-4 py-2">{{ medicine.name }}</td>
-            <td class="px-4 py-2">${{ medicine.price }}</td>
+            <td class="px-4 py-2">GH₵{{ medicine.price }}</td>
             <td class="px-4 py-2">{{ medicine.stock_quantity }}</td>
             <td class="px-4 py-2">{{ medicine.description || 'N/A' }}</td>
             <td class="px-4 py-2">
@@ -220,7 +220,7 @@
       <h3 class="text-xl font-semibold mb-4">Medicine Details</h3>
       <div class="space-y-2">
         <p><strong>Name:</strong> {{ selectedMedicine.name }}</p>
-        <p><strong>Price:</strong> ${{ selectedMedicine.price }}</p>
+        <p><strong>Price:</strong> GH₵{{ selectedMedicine.price }}</p>
         <p><strong>Quantity:</strong> {{ selectedMedicine.stock_quantity }}</p>
         <p><strong>Description:</strong> {{ selectedMedicine.description || 'N/A' }}</p>
         <p><strong>Created At:</strong> {{ selectedMedicine.created_at }}</p>
