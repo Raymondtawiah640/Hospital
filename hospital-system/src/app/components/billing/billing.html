@@ -179,7 +179,7 @@
         <p><strong>Invoice Number:</strong> {{ selectedBill.invoice_number }}</p>
         <p><strong>Patient:</strong> {{ selectedBill.patient_name }}</p>
         <p><strong>Doctor:</strong> {{ selectedBill.doctor_name }}</p>
-        <p><strong>Amount:</strong> ${{ selectedBill.amount }}</p>
+        <p><strong>Amount:</strong> GH₵{{ selectedBill.amount }}</p>
         <p><strong>Date:</strong> {{ selectedBill.date }}</p>
         <p><strong>Status:</strong> <span [ngClass]="getStatusClass(selectedBill.status)">{{ selectedBill.status | titlecase }}</span></p>
       </div>
