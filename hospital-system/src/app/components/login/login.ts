@@ -67,13 +67,7 @@ export class Login {
       return;
     }
 
-    // Check password strength
-    if (!passwordRegex.test(this.password)) {
-      this.message =
-        '⚠️ Password must be 8-20 chars, include uppercase, lowercase, number, and special char';
-      this.isLoading = false; // stop loading if password doesn't meet criteria
-      return;
-    }
+    // Password strength check removed for first login flexibility
 
     // Call AuthService with all 3 values
     this.auth.login(this.staff_id, this.department, this.password).subscribe({

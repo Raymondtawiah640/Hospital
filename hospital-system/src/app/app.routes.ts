@@ -25,7 +25,8 @@ import { Schedules } from './components/schedules/schedules';
 import { TestResults } from './components/test-results/test-results';
 import { Login } from './components/login/login';
 import { Profile } from './components/profile/profile';
-import { ShedulesHistory } from './components/shedules-history/shedules-history';   
+import { ShedulesHistory } from './components/shedules-history/shedules-history';
+import { Authenticate } from './components/authenticate/authenticate';   
 
 export const routes: Routes = [
     { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, // default route
@@ -56,5 +57,6 @@ export const routes: Routes = [
     {path: 'login', component: Login},
     {path: 'profile', component: Profile},
     {path: 'history', component: ShedulesHistory},
+    {path: 'authenticate', component: Authenticate},
     { path: '**', redirectTo: '/dashboard' }
 ];

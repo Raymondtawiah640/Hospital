@@ -106,7 +106,7 @@ try {
     } elseif (strtolower($department) !== strtolower($staff['department'])) {
         $isValid = false;
         $errorMessage = "❌ Department does not match the staff record.";
-    } elseif (!in_array(strtolower($staff['department']), ["administration", "nursing", "surgery", "pharmacy", "pediatrics"])) {
+    } elseif (!in_array(strtolower($staff['department']), ["administration", "nursing", "surgery", "pharmacy", "pediatrics", "laboratory", "finance"])) {
         $isValid = false;
         $errorMessage = "⛔ Access denied. Your department is not authorized.";
     } elseif (!empty($staff['password']) && !password_verify($password, $staff['password'])) {

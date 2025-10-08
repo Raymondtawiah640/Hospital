@@ -60,10 +60,10 @@
             Lab & Pharmacy <span class="ml-1">▾</span>
           </button>
           <div *ngIf="openDropdown === 'lab'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
-            <a routerLink="/laboratory-tests" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Laboratory Tests</a>
-            <a routerLink="/test-results" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
-            <a routerLink="/pharmacy-stock" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Pharmacy Stock</a>
-            <a routerLink="/prescriptions" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
+            <a *ngIf="isLaboratory() || isAdmin()" routerLink="/laboratory-tests" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Laboratory Tests</a>
+            <a *ngIf="isLaboratory() || isAdmin()" routerLink="/test-results" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
+            <a *ngIf="isPharmacy() || isAdmin()" routerLink="/pharmacy-stock" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Pharmacy Stock</a>
+            <a *ngIf="isAdmin()" routerLink="/prescriptions" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
           </div>
         </div>
 
@@ -73,8 +73,8 @@
             Billing & Records <span class="ml-1">▾</span>
           </button>
           <div *ngIf="openDropdown === 'billing'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-52 z-50">
-            <a routerLink="/billing" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Billing</a>
-            <a routerLink="/invoices" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Invoices</a>
+            <a *ngIf="isFinance() ||  isAdmin()" routerLink="/billing" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Billing</a>
+            <a *ngIf="isFinance() ||  isAdmin()" routerLink="/invoices" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Invoices</a>
             <a *ngIf="isAdmin()" routerLink="/medical-records" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Medical Records</a>
           </div>
         </div>
@@ -101,6 +101,7 @@
             <a routerLink="/daily-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Daily Reports</a>
             <a routerLink="/monthly-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Monthly Reports</a>
             <a *ngIf="isAdmin()" routerLink="/annual-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Annual Reports</a>
+            <a *ngIf="isAdmin()" routerLink="/authenticate" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Authenticate</a>
           </div>
         </div>
 
@@ -148,10 +149,10 @@
         <a routerLink="/all-appointments" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Appointments</a>
         <a routerLink="/book-appointment" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Book Appointment</a>
         <a *ngIf="isAdmin()" routerLink="/appointment-history" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Appointment History</a>
-        <a routerLink="/laboratory-tests" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Laboratory Tests</a>
-        <a routerLink="/test-results" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Test Results</a>
-        <a routerLink="/pharmacy-stock" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pharmacy Stock</a>
-        <a routerLink="/prescriptions" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Prescriptions</a>
+        <a *ngIf="isLaboratory() || isAdmin()" routerLink="/laboratory-tests" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Laboratory Tests</a>
+        <a *ngIf="isLaboratory() || isAdmin()" routerLink="/test-results" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Test Results</a>
+        <a *ngIf="isPharmacy() || isAdmin()" routerLink="/pharmacy-stock" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pharmacy Stock</a>
+        <a *ngIf="isAdmin()" routerLink="/prescriptions" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Prescriptions</a>
         <a routerLink="/billing" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Billing</a>
         <a routerLink="/invoices" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Invoices</a>
         <a routerLink="/medical-records" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Medical Records</a>

@@ -64,4 +64,16 @@ isAdmin(): boolean {
   return this.getDepartment() === 'Administration';
 }
 
+isPharmacy(): boolean {
+  return this.getDepartment() === 'pharmacy';
+}
+
+isLaboratory(): boolean {
+  return this.getDepartment() === 'Laboratory';
+}
+
+isFinance(): boolean {
+  return this.getDepartment() === 'Finance'
+}
+
 }
