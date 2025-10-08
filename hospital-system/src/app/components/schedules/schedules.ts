@@ -82,45 +82,38 @@ export class Schedules implements OnInit {
     this.successMessage = '';
     this.isLoading = true;
 
-    if (this.scheduleData.doctorId && this.scheduleData.day &&
-        this.scheduleData.startTime && this.scheduleData.endTime &&
-        this.scheduleData.department) {
-      this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-schedule.php', this.scheduleData, {
-        headers: { 'Content-Type': 'application/json' }
-      }).subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
-          if (response.success) {
-            this.successMessage = 'Schedule added successfully!';
+    // Form validation is already handled by button disabled state
+    this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-schedule.php', this.scheduleData, {
+      headers: { 'Content-Type': 'application/json' }
+    }).subscribe({
+      next: (response: any) => {
+        this.isLoading = false;
+        if (response.success) {
+          this.successMessage = 'Schedule added successfully!';
 
-            // ✅ Reset form
-            scheduleForm.resetForm();
-            this.scheduleData = {
-              doctorId: '',
-              day: '',
-              date: '',
-              startTime: '',
-              endTime: '',
-              department: ''
-            };
+          // ✅ Reset form data
+          this.scheduleData = {
+            doctorId: '',
+            day: '',
+            date: '',
+            startTime: '',
+            endTime: '',
+            department: ''
+          };
 
-            // ✅ Auto clear success message after 3s
-            setTimeout(() => {
-              this.successMessage = '';
-            }, 3000);
-          } else {
-            this.errorMessage = response.message || 'Failed to add schedule.';
-          }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          console.error('Error adding schedule:', err);
-          this.errorMessage = 'There was a problem with the request. Please try again later.';
+          // ✅ Auto clear success message after 3s
+          setTimeout(() => {
+            this.successMessage = '';
+          }, 3000);
+        } else {
+          this.errorMessage = response.message || 'Failed to add schedule.';
         }
-      });
-    } else {
-      this.isLoading = false;
-      this.errorMessage = 'Please fill in all fields.';
-    }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error adding schedule:', err);
+        this.errorMessage = 'There was a problem with the request. Please try again later.';
+      }
+    });
   }
 }

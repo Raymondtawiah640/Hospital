@@ -100,25 +100,29 @@ export class AllDoctors implements OnInit {
   markAttendance(schedule: any): void {
     if (!this.selectedDoctorId) return;
 
+    // Immediately change button to "Attendance Done" without waiting for API
+    schedule.is_attended = true;
+
     const payload = {
       doctor_id: this.selectedDoctorId,
       schedule_id: schedule.id
     };
 
-    this.isLoading = true;
+    // Make API call in background without blocking UI
     this.http.post('https://kilnenterprise.com/presbyterian-hospital/save-attendance.php', payload)
       .subscribe({
         next: (res: any) => {
-          this.isLoading = false;
           if (res.success) {
-            alert('✅ Attendance marked successfully!');
-            schedule.is_attended = true; // Disable button locally
+            // Attendance saved successfully - button already shows "Attendance Done"
           } else {
+            // If API fails, revert the button state
+            schedule.is_attended = false;
             alert('⚠️ ' + res.message);
           }
         },
         error: (err) => {
-          this.isLoading = false;
+          // If API fails, revert the button state
+          schedule.is_attended = false;
           console.error('Error marking attendance:', err);
           alert('❌ Failed to mark attendance. Please try again.');
         }

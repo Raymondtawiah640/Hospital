@@ -20,10 +20,9 @@ try {
             d.first_name, 
             d.last_name, 
             d.id AS doctor_id,
-            CASE 
-                WHEN ds.day = DAYNAME(CURDATE()) 
-                     AND CURTIME() BETWEEN ds.start_time AND ds.end_time 
-                THEN 1 ELSE 0 
+            CASE
+                WHEN ds.schedule_date <= CURDATE()
+                THEN 1 ELSE 0
             END AS is_active,
             CASE 
                 WHEN da.id IS NOT NULL THEN 1 ELSE 0

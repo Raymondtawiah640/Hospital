@@ -29,8 +29,8 @@
 
       <!-- Select Doctor -->
       <div class="mb-6">
-        <label for="doctorId" class="block text-gray-700 font-semibold mb-2">Doctor <span [class.text-red-500]="!doctorId?.value" [class.text-green-500]="doctorId?.value">*</span></label>
-        <select #doctorId="ngModel" id="doctorId" name="doctorId" [(ngModel)]="doctorId.value" required
+        <label for="doctorId" class="block text-gray-700 font-semibold mb-2">Doctor <span [class.text-red-500]="!scheduleData.doctorId" [class.text-green-500]="scheduleData.doctorId">*</span></label>
+        <select id="doctorId" name="doctorId" [(ngModel)]="scheduleData.doctorId" required
             class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
             <option value="">Select Doctor</option>
             <option *ngFor="let doctor of filteredDoctors" [value]="doctor.id">
@@ -41,8 +41,8 @@
 
       <!-- Select Day -->
       <div class="mb-6">
-        <label for="day" class="block text-gray-700 font-semibold mb-2">Day <span [class.text-red-500]="!day?.value" [class.text-green-500]="day?.value">*</span></label>
-        <select #day="ngModel" id="day" name="day" [(ngModel)]="day.value" required
+        <label for="day" class="block text-gray-700 font-semibold mb-2">Day <span [class.text-red-500]="!scheduleData.day" [class.text-green-500]="scheduleData.day">*</span></label>
+        <select id="day" name="day" [(ngModel)]="scheduleData.day" required
           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
           <option value="">Select Day</option>
           <option>Monday</option>
@@ -56,29 +56,29 @@
       </div>
 
       <div class="mb-6">
-        <label for="date" class="block text-gray-700 font-semibold mb-2">Date <span [class.text-red-500]="!date?.value" [class.text-green-500]="date?.value">*</span></label>
-        <input #date="ngModel" id="date" name="date" [(ngModel)]="date.value" type="date" required
+        <label for="date" class="block text-gray-700 font-semibold mb-2">Date <span [class.text-red-500]="!scheduleData.date" [class.text-green-500]="scheduleData.date">*</span></label>
+        <input id="date" name="date" [(ngModel)]="scheduleData.date" type="date" required
               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
       </div>
 
       <!-- Start Time -->
       <div class="mb-6">
-        <label for="startTime" class="block text-gray-700 font-semibold mb-2">Start Time <span [class.text-red-500]="!startTime?.value" [class.text-green-500]="startTime?.value">*</span></label>
-        <input #startTime="ngModel" id="startTime" name="startTime" [(ngModel)]="startTime.value" type="time" required
+        <label for="startTime" class="block text-gray-700 font-semibold mb-2">Start Time <span [class.text-red-500]="!scheduleData.startTime" [class.text-green-500]="scheduleData.startTime">*</span></label>
+        <input id="startTime" name="startTime" [(ngModel)]="scheduleData.startTime" type="time" required
           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
       </div>
 
       <!-- End Time -->
       <div class="mb-6">
-        <label for="endTime" class="block text-gray-700 font-semibold mb-2">End Time <span [class.text-red-500]="!endTime?.value" [class.text-green-500]="endTime?.value">*</span></label>
-        <input #endTime="ngModel" id="endTime" name="endTime" [(ngModel)]="endTime.value" type="time" required
+        <label for="endTime" class="block text-gray-700 font-semibold mb-2">End Time <span [class.text-red-500]="!scheduleData.endTime" [class.text-green-500]="scheduleData.endTime">*</span></label>
+        <input id="endTime" name="endTime" [(ngModel)]="scheduleData.endTime" type="time" required
           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
       </div>
 
       <!-- Select Department -->
       <div class="mb-6">
-        <label for="department" class="block text-gray-700 font-semibold mb-2">Department <span [class.text-red-500]="!department?.value" [class.text-green-500]="department?.value">*</span></label>
-        <select #department="ngModel" id="department" name="department" [(ngModel)]="department.value" required
+        <label for="department" class="block text-gray-700 font-semibold mb-2">Department <span [class.text-red-500]="!scheduleData.department" [class.text-green-500]="scheduleData.department">*</span></label>
+        <select id="department" name="department" [(ngModel)]="scheduleData.department" required
           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
           <option value="">Select Department</option>
           <option>General Medicine</option>
@@ -93,8 +93,8 @@
 
       <!-- Submit Button -->
       <div class="mt-8 flex justify-end">
-        <button type="submit" [disabled]="!scheduleForm.form.valid || isLoading"
-          class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200">
+        <button type="submit" [disabled]="!(scheduleData.doctorId && scheduleData.day && scheduleData.date && scheduleData.startTime && scheduleData.endTime && scheduleData.department) || isLoading"
+          class="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">
           <span *ngIf="isLoading">Saving...</span>
           <span *ngIf="!isLoading">Save Schedule</span>
         </button>
