@@ -75,8 +75,8 @@ export class DailyReports implements OnInit, OnDestroy {
 
   generateReport(): void {
     this.isLoading = true;
-    // Fetch data for the selected date
-    const apiUrl = `https://kilnenterprise.com/presbyterian-hospital/daily-report.php?date=${this.selectedDate}`;
+    // Fetch all data (remove date filter to show all)
+    const apiUrl = `https://kilnenterprise.com/presbyterian-hospital/daily-report.php`;
     this.http.get<any>(apiUrl).subscribe(
       (response) => {
         this.isLoading = false;

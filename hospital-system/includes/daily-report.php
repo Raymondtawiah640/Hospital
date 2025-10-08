@@ -9,36 +9,66 @@ include 'db_connect.php';
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
+    $date = isset($_GET['date']) ? $_GET['date'] : null;
 
     try {
-        // Get total patients (unique patients with activities on the date)
-        $stmt = $pdo->prepare("SELECT COUNT(DISTINCT patient_id) as total FROM laboratory_tests WHERE DATE(date) = ?");
-        $stmt->execute([$date]);
+        // Get total patients (unique patients with activities)
+        $query = "SELECT COUNT(DISTINCT patient_id) as total FROM laboratory_tests";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(date) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $totalPatients = $stmt->fetch()['total'];
 
-        // Get total lab tests on the date
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM laboratory_tests WHERE DATE(date) = ?");
-        $stmt->execute([$date]);
+        // Get total lab tests
+        $query = "SELECT COUNT(*) as total FROM laboratory_tests";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(date) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $totalLabTests = $stmt->fetch()['total'];
 
-        // Get total prescriptions on the date
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM prescriptions WHERE DATE(created_at) = ?");
-        $stmt->execute([$date]);
+        // Get total prescriptions
+        $query = "SELECT COUNT(*) as total FROM prescriptions";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(created_at) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $totalPrescriptions = $stmt->fetch()['total'];
 
-        // Get total bills on the date
-        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM bills WHERE DATE(date) = ?");
-        $stmt->execute([$date]);
+        // Get total bills
+        $query = "SELECT COUNT(*) as total FROM bills";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(date) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $totalBills = $stmt->fetch()['total'];
 
-        // Get total revenue on the date
-        $stmt = $pdo->prepare("SELECT SUM(amount) as total FROM bills WHERE DATE(date) = ? AND status = 'paid'");
-        $stmt->execute([$date]);
+        // Get total revenue
+        $query = "SELECT SUM(amount) as total FROM bills WHERE status = 'paid'";
+        $params = [];
+        if ($date) {
+            $query .= " AND DATE(date) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $totalRevenue = $stmt->fetch()['total'] ?? 0;
 
         // Get lab tests details
-        $stmt = $pdo->prepare("
+        $query = "
             SELECT
                 CONCAT(p.first_name, ' ', p.last_name) as patient_name,
                 CONCAT(d.first_name, ' ', d.last_name) as doctor_name,
@@ -48,13 +78,18 @@ if ($method === 'GET') {
             FROM laboratory_tests lab
             LEFT JOIN patients p ON lab.patient_id = p.id
             LEFT JOIN doctors d ON lab.doctor = d.id
-            WHERE DATE(lab.date) = ?
-        ");
-        $stmt->execute([$date]);
+        ";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(lab.date) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $labTests = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get prescriptions details
-        $stmt = $pdo->prepare("
+        $query = "
             SELECT
                 CONCAT(p.first_name, ' ', p.last_name) as patient_name,
                 CONCAT(d.first_name, ' ', d.last_name) as doctor_name,
@@ -62,22 +97,32 @@ if ($method === 'GET') {
             FROM prescriptions pr
             LEFT JOIN patients p ON pr.patient_id = p.id
             LEFT JOIN doctors d ON pr.doctor_id = d.id
-            WHERE DATE(pr.created_at) = ?
-            GROUP BY pr.patient_id, pr.doctor_id
-        ");
-        $stmt->execute([$date]);
+        ";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(pr.created_at) = ?";
+            $params[] = $date;
+        }
+        $query .= " GROUP BY pr.patient_id, pr.doctor_id";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $prescriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get bills details
-        $stmt = $pdo->prepare("
+        $query = "
             SELECT
                 patient_name,
                 amount,
                 status
             FROM bills
-            WHERE DATE(date) = ?
-        ");
-        $stmt->execute([$date]);
+        ";
+        $params = [];
+        if ($date) {
+            $query .= " WHERE DATE(date) = ?";
+            $params[] = $date;
+        }
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
         $bills = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode([
