@@ -89,7 +89,7 @@
           <td class="px-4 py-2">{{ bill.invoice_number }}</td>
           <td class="px-4 py-2">{{ bill.patient_name }}</td>
           <td class="px-4 py-2">{{ bill.doctor_name }}</td>
-          <td class="px-4 py-2">${{ bill.amount }}</td>
+          <td class="px-4 py-2">GH₵{{ bill.amount }}</td>
           <td class="px-4 py-2">{{ bill.date }}</td>
           <td class="px-4 py-2">
             <span [ngClass]="getStatusClass(bill.status)">{{ bill.status | titlecase }}</span>
