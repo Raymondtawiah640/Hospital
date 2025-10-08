@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap, catchError, throwError } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Observable, tap, catchError, throwError, of } from 'rxjs';
 
 export interface Staff {
   staff_id: string;
@@ -12,6 +12,8 @@ interface LoginResponse {
   success: boolean;
   staff?: Staff;
   message?: string;
+  lockout?: boolean;
+  remainingTime?: number;
 }
 
 @Injectable({
@@ -39,17 +41,19 @@ export class AuthService {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })
     }).pipe(
       tap(response => {
-      console.log('DEBUG: Response from backend:', response);
-      if (response.success && response.staff) {
-        localStorage.setItem('staff', JSON.stringify(response.staff));
-        this.loggedIn.set(true);
-
-        // ✅ Store department separately for quick checks
-        localStorage.setItem('department', response.staff.department);
-      }
-    }),
+        console.log('DEBUG: Response from backend:', response);
+        if (response.success && response.staff) {
+          localStorage.setItem('staff', JSON.stringify(response.staff));
+          this.loggedIn.set(true);
+          localStorage.setItem('department', response.staff.department);
+        }
+      }),
       catchError(err => {
         console.error('Login error:', err);
+        if (err.status === 429) {
+          // Lockout, return the response
+          return of(err.error);
+        }
         return throwError(() => new Error('Login failed. Please try again.'));
       })
     );

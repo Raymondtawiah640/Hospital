@@ -64,9 +64,9 @@
       </div>
 
       <!-- Submit Button -->
-      <button type="submit"
-        class="w-full bg-red-600 text-white py-1.5 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-300">
-        Login
+      <button type="submit" [disabled]="remainingTime > 0"
+        class="w-full bg-red-600 text-white py-1.5 px-4 rounded-lg shadow-md hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-300">
+        {{ remainingTime > 0 ? 'Locked' : 'Login' }}
       </button>
     </form>
   </div>

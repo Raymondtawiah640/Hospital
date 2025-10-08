@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -18,16 +18,43 @@ export class Login {
   message: string = '';
   showPassword: boolean = false;
   isLoading: boolean = false; // to handle the loading state
+  lockoutTimer: any;
+  remainingTime: number = 0;
 
-  constructor(private router: Router, private auth: AuthService) {}
+  constructor(private router: Router, private auth: AuthService, private ngZone: NgZone) {}
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
+  startLockout(remainingTime: number): void {
+    this.remainingTime = remainingTime;
+    this.message = `❌ Too many failed attempts. Try again in ${Math.ceil(this.remainingTime / 60)} minute(s).`;
+    this.ngZone.run(() => {
+      this.lockoutTimer = setInterval(() => {
+        this.remainingTime--;
+        if (this.remainingTime <= 0) {
+          this.clearLockout();
+        } else {
+          this.message = `❌ Too many failed attempts. Try again in ${Math.ceil(this.remainingTime / 60)} minute(s).`;
+        }
+      }, 1000);
+    });
+  }
+
+  clearLockout(): void {
+    if (this.lockoutTimer) {
+      clearInterval(this.lockoutTimer);
+      this.lockoutTimer = null;
+    }
+    this.remainingTime = 0;
+    this.message = '';
+  }
+
   login(): void {
     this.isLoading = true; // start loading indicator
     this.message = '';
+    this.clearLockout(); // Clear any previous lockout
 
     // Strong password regex
     const passwordRegex =
@@ -53,10 +80,16 @@ export class Login {
       next: (res) => {
         this.isLoading = false; // stop loading after response
         if (res.success && res.staff) {
+          this.clearLockout();
           this.router.navigate(['/dashboard']);
         } else {
-          // More user-friendly error handling
-          this.message = '❌ The credentials provided do not match our records. Please double-check and try again.';
+          // Handle lockout
+          if (res.lockout && res.remainingTime) {
+            this.startLockout(res.remainingTime);
+          } else {
+            // More user-friendly error handling
+            this.message = res.message || '❌ The credentials provided do not match our records. Please double-check and try again.';
+          }
         }
       },
       error: (err) => {
