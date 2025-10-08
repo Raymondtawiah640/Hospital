@@ -60,20 +60,20 @@ export class Navbar {
   return localStorage.getItem('department');
 }
 
-isAdmin(): boolean {
+get isAdmin(): boolean {
   return this.getDepartment() === 'Administration';
 }
 
-isPharmacy(): boolean {
+get isPharmacy(): boolean {
   return this.getDepartment() === 'Pharmacy';
 }
 
-isLaboratory(): boolean {
+get isLaboratory(): boolean {
   return this.getDepartment() === 'Laboratory';
 }
 
-isFinance(): boolean {
-  return this.getDepartment() === 'Finance'
+get isFinance(): boolean {
+  return this.getDepartment() === 'Finance';
 }
 
 }
