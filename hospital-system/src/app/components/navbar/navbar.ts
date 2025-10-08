@@ -65,7 +65,7 @@ isAdmin(): boolean {
 }
 
 isPharmacy(): boolean {
-  return this.getDepartment() === 'pharmacy';
+  return this.getDepartment() === 'Pharmacy';
 }
 
 isLaboratory(): boolean {

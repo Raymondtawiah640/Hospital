@@ -163,6 +163,7 @@
         <a routerLink="/daily-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Daily Reports</a>
         <a routerLink="/monthly-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Monthly Reports</a>
         <a *ngIf="isAdmin()" routerLink="/annual-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Annual Reports</a>
+        <a *ngIf="isAdmin()" routerLink="/authenticate" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Authenticate</a>
       </div>
     </div>
   </div>
