@@ -76,4 +76,8 @@ get isFinance(): boolean {
   return this.getDepartment() === 'Finance';
 }
 
+get isEmergency(): boolean {
+  return this.getDepartment() === 'Emergency'
+}
+
 }

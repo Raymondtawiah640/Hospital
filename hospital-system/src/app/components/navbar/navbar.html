@@ -49,7 +49,7 @@
           </button>
           <div *ngIf="openDropdown === 'appointments'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
             <a routerLink="/all-appointments" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">All Appointments</a>
-            <a routerLink="/book-appointment" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Book Appointment</a>
+            <a *ngIf="isAdmin || isEmergency" routerLink="/book-appointment" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Book Appointment</a>
             <a *ngIf="isAdmin" routerLink="/appointment-history" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Appointment History</a>
           </div>
         </div>
@@ -61,9 +61,9 @@
           </button>
           <div *ngIf="openDropdown === 'lab'" class="absolute left-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
             <a *ngIf="isLaboratory || isAdmin" routerLink="/laboratory-tests" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Laboratory Tests</a>
-            <a *ngIf="isLaboratory || isAdmin" routerLink="/test-results" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
+            <a *ngIf="isLaboratory || isAdmin || isEmergency" routerLink="/test-results" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Test Results</a>
             <a *ngIf="isPharmacy || isAdmin" routerLink="/pharmacy-stock" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Pharmacy Stock</a>
-            <a *ngIf="isAdmin" routerLink="/prescriptions" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
+            <a *ngIf="isAdmin || isLaboratory || isEmergency" routerLink="/prescriptions" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Prescriptions</a>
           </div>
         </div>
 
@@ -98,8 +98,8 @@
             Reports <span class="ml-1">▾</span>
           </button>
           <div *ngIf="openDropdown === 'reports'" class="absolute right-0 flex flex-col bg-white text-black mt-2 rounded shadow-lg w-48 z-50">
-            <a routerLink="/daily-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Daily Reports</a>
-            <a routerLink="/monthly-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Monthly Reports</a>
+            <a *ngIf="isAdmin" routerLink="/daily-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Daily Reports</a>
+            <a *ngIf="isAdmin" routerLink="/monthly-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Monthly Reports</a>
             <a *ngIf="isAdmin" routerLink="/annual-reports" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Annual Reports</a>
             <a *ngIf="isAdmin" routerLink="/authenticate" (click)="navigateAndClose()" class="block px-4 py-2 hover:bg-green-100">Authenticate</a>
           </div>
@@ -147,21 +147,21 @@
         <a *ngIf="isAdmin" routerLink="/add-doctor" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Add Doctor</a>
         <a *ngIf="isAdmin" routerLink="/schedules" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Schedules</a>
         <a routerLink="/all-appointments" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">All Appointments</a>
-        <a routerLink="/book-appointment" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Book Appointment</a>
+        <a *ngIf="isAdmin || isEmergency" routerLink="/book-appointment" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Book Appointment</a>
         <a *ngIf="isAdmin" routerLink="/appointment-history" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Appointment History</a>
         <a *ngIf="isLaboratory || isAdmin" routerLink="/laboratory-tests" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Laboratory Tests</a>
         <a *ngIf="isLaboratory || isAdmin" routerLink="/test-results" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Test Results</a>
         <a *ngIf="isPharmacy || isAdmin" routerLink="/pharmacy-stock" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pharmacy Stock</a>
-        <a *ngIf="isAdmin" routerLink="/prescriptions" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Prescriptions</a>
-        <a routerLink="/billing" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Billing</a>
-        <a routerLink="/invoices" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Invoices</a>
+        <a *ngIf="isAdmin || isLaboratory || isEmergency" routerLink="/prescriptions" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Prescriptions</a>
+        <a *ngIf="isFinance || isAdmin" routerLink="/billing" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Billing</a>
+        <a *ngIf="isAdmin || isFinance" routerLink="/invoices" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Invoices</a>
         <a routerLink="/medical-records" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Medical Records</a>
         <a routerLink="/general-department" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">General Department</a>
         <a routerLink="/cardiology" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Cardiology</a>
         <a routerLink="/pediatrics" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Pediatrics</a>
         <a routerLink="/emergency" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Emergency</a>
-        <a routerLink="/daily-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Daily Reports</a>
-        <a routerLink="/monthly-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Monthly Reports</a>
+        <a *ngIf="isAdmin" routerLink="/daily-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Daily Reports</a>
+        <a *ngIf="isAdmin" routerLink="/monthly-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Monthly Reports</a>
         <a *ngIf="isAdmin" routerLink="/annual-reports" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Annual Reports</a>
         <a *ngIf="isAdmin" routerLink="/authenticate" (click)="closeMenu()" class="block px-4 py-2 hover:bg-blue-600">Authenticate</a>
       </div>

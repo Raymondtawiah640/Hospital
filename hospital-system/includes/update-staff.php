@@ -70,7 +70,7 @@ try {
             exit;
         }
 
-        $validDepartments = ["administration", "nursing", "surgery", "pharmacy", "pediatrics", "laboratory", "finance"];
+        $validDepartments = ["administration", "nursing", "surgery", "pharmacy", "pediatrics", "laboratory", "finance", "emergency"];
         if (!in_array(strtolower($department), $validDepartments)) {
             http_response_code(400);
             echo json_encode(["success" => false, "message" => "⚠️ Invalid department."]);

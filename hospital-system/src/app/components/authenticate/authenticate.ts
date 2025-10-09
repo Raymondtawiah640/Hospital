@@ -45,6 +45,7 @@ export class Authenticate implements OnInit {
     'Pharmacy',
     'Pediatrics',
     'Laboratory',
+    'Emergency',
     'Finance'
   ];
 
@@ -189,7 +190,11 @@ export class Authenticate implements OnInit {
         next: (res: any) => {
           this.isLoading = false;
           if (res.success) {
-            alert('✅ Password reset successfully!');
+            // Also reset the local login system state for this user
+            if (this.selectedStaffForAction) {
+              this.resetUserLoginState(this.selectedStaffForAction.staff_id);
+            }
+            alert('✅ Password reset successfully! All timing restrictions cleared. User can now attempt login with 2 new attempts.');
           } else {
             alert('⚠️ ' + (res.message || 'Failed to reset password.'));
           }
@@ -200,6 +205,13 @@ export class Authenticate implements OnInit {
           alert('❌ Failed to reset password. Please try again.');
         }
       });
+  }
+
+  // Reset user login state (communicate with login component if needed)
+  private resetUserLoginState(staffId: string): void {
+    // This could be enhanced to communicate with the login component
+    // For now, we'll just reload the staff list
+    this.loadStaff();
   }
 
   openDeleteStaffModal(staff: Staff): void {

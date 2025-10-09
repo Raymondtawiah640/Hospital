@@ -107,6 +107,9 @@ export class BookAppointment implements OnInit {
 
   // Handle form submission
   onSubmit(): void {
+    console.log('Form submitted with data:', this.scheduleData);
+    console.log('Form valid:', this.isFormValid);
+
     if (this.scheduleData.patientId && this.scheduleData.doctorId && this.scheduleData.department && this.scheduleData.date && this.scheduleData.time && this.scheduleData.reason) {
       this.isLoading = true;
 
@@ -158,5 +161,15 @@ export class BookAppointment implements OnInit {
       time: '',
       reason: ''
     };
+  }
+
+  // Getter to check if form is valid and button should be enabled
+  get isFormValid(): boolean {
+    return !!(this.scheduleData.patientId &&
+              this.scheduleData.doctorId &&
+              this.scheduleData.department &&
+              this.scheduleData.date &&
+              this.scheduleData.time &&
+              this.scheduleData.reason);
   }
 }

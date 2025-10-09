@@ -64,30 +64,6 @@ if (!$staff_id || !$department || !$password) {
     exit;
 }
 
-// ----------------- CHECK LOCKOUT -----------------
-$attemptData = null;
-try {
-    $lockoutCheckStmt = $pdo->prepare("SELECT attempts, lockout_until FROM login_attempts WHERE staff_id = ?");
-    $lockoutCheckStmt->execute([$staff_id]);
-    $attemptData = $lockoutCheckStmt->fetch(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    // Table may not exist, skip lockout
-    error_log("DEBUG: login_attempts table not found, skipping lockout: " . $e->getMessage());
-}
-
-$currentTime = time();
-if ($attemptData && $attemptData['lockout_until'] > $currentTime) {
-    $remainingTime = $attemptData['lockout_until'] - $currentTime;
-    $minutes = ceil($remainingTime / 60);
-    http_response_code(429); // Too Many Requests
-    echo json_encode([
-        "success" => false,
-        "message" => "❌ Too many failed attempts. Try again in $minutes minute(s).",
-        "lockout" => true,
-        "remainingTime" => $remainingTime
-    ]);
-    exit;
-}
 
 // ----------------- AUTH LOGIC -----------------
 try {
@@ -99,53 +75,29 @@ try {
     $isValid = true;
     $errorMessage = '';
 
-    // Handle case where staff ID doesn't exist
+    // Handle authentication failure - general message for any credential issue
     if (!$staff) {
         $isValid = false;
-        $errorMessage = "❌ Invalid Staff ID.";
+        $errorMessage = "❌ Wrong credentials. Please contact administrator to verify your login information.";
     } elseif (strtolower($department) !== strtolower($staff['department'])) {
         $isValid = false;
-        $errorMessage = "❌ Department does not match the staff record.";
-    } elseif (!in_array(strtolower($staff['department']), ["administration", "nursing", "surgery", "pharmacy", "pediatrics", "laboratory", "finance"])) {
-        $isValid = false;
-        $errorMessage = "⛔ Access denied. Your department is not authorized.";
-    } elseif (!empty($staff['password']) && !password_verify($password, $staff['password'])) {
-        $isValid = false;
-        $errorMessage = "❌ Invalid password.";
+        $errorMessage = "❌ Wrong credentials. Please contact administrator to verify your login information.";
+    } elseif (!empty($staff['password'])) {
+        // Password exists in DB - verify it
+        if (!password_verify($password, $staff['password'])) {
+            $isValid = false;
+            $errorMessage = "❌ Wrong credentials. Please contact administrator to verify your login information.";
+        }
     }
+     // If password is empty in DB, allow login (will be handled in success section)
 
     if (!$isValid) {
-        // Increment attempts
-        try {
-            $attempts = ($attemptData ? $attemptData['attempts'] : 0) + 1;
-            $lockoutUntil = 0;
-            if ($attempts >= 3) {
-                $lockoutMinutes = 5 + (($attempts - 3) * 5); // 5 min for 3rd, 10 for 4th, etc.
-                $lockoutUntil = $currentTime + ($lockoutMinutes * 60);
-            }
-            if ($attemptData) {
-                $updateStmt = $pdo->prepare("UPDATE login_attempts SET attempts = ?, lockout_until = ? WHERE staff_id = ?");
-                $updateStmt->execute([$attempts, $lockoutUntil, $staff_id]);
-            } else {
-                $insertStmt = $pdo->prepare("INSERT INTO login_attempts (staff_id, attempts, lockout_until) VALUES (?, ?, ?)");
-                $insertStmt->execute([$staff_id, $attempts, $lockoutUntil]);
-            }
-        } catch (PDOException $e) {
-            // If table doesn't exist, just log
-            error_log("DEBUG: Could not update login_attempts: " . $e->getMessage());
-        }
         http_response_code(401);
         echo json_encode(["success" => false, "message" => $errorMessage]);
         exit;
     }
 
-    // Successful login: reset attempts
-    try {
-        $resetStmt = $pdo->prepare("DELETE FROM login_attempts WHERE staff_id = ?");
-        $resetStmt->execute([$staff_id]);
-    } catch (PDOException $e) {
-        // If table doesn't exist, skip
-    }
+    // Successful login
 
     // Handle password: if empty in DB, accept any password and hash it
     if (empty($staff['password'])) {
