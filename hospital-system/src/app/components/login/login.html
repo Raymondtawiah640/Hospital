@@ -17,10 +17,10 @@
         <span>{{ getAuthStatusText() }}</span>
       </div>
       <div class="text-sm mt-1" *ngIf="!hasPasswordInDB">
-        🔓 No password set - You can set a new password
+        {{ messages.noPasswordSet }}
       </div>
       <div class="text-sm mt-1" *ngIf="hasPasswordInDB">
-        🔐 Password required - Enter correct password to login
+        {{ messages.passwordRequired }}
       </div>
     </div>
 
@@ -136,11 +136,6 @@
         {{ isLoading ? 'Processing...' : 'Login' }}
       </button>
 
-      <!-- Admin Help Button (show for any login failure) -->
-      <button *ngIf="message && message.includes('administrator')" type="button" (click)="resetPasswordInDB()"
-        class="w-full mt-2 bg-blue-600 text-white py-1.5 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
-        🔧 Contact Administrator to Verify Credentials
-      </button>
     </form>
   </div>
 </div>

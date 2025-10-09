@@ -48,13 +48,13 @@ export class AllDoctors implements OnInit {
           if (data.success && Array.isArray(data.doctors)) {
             this.doctors = data.doctors;
           } else {
-            this.errorMessage = 'Failed to load doctor data.';
+            //this.errorMessage = 'Failed to load doctor data.';
           }
         },
         error: (err) => {
           this.isLoading = false;
           console.error('Error loading doctors:', err);
-          this.errorMessage = 'There was a problem fetching doctor data.';
+         // this.errorMessage = 'There was a problem fetching doctor data.';
         }
       });
   }
@@ -73,13 +73,13 @@ export class AllDoctors implements OnInit {
             }));
           } else {
             this.selectedDoctorSchedules = [];
-            this.errorMessage = 'No schedules available for this doctor.';
+            //this.errorMessage = 'No schedules available for this doctor.';
           }
         },
         error: (err) => {
           this.isLoading = false;
           console.error('Error loading schedules:', err);
-          this.errorMessage = 'There was a problem fetching schedules.';
+          //this.errorMessage = 'There was a problem fetching schedules.';
         }
       });
   }
@@ -123,8 +123,8 @@ export class AllDoctors implements OnInit {
         error: (err) => {
           // If API fails, revert the button state
           schedule.is_attended = false;
-          console.error('Error marking attendance:', err);
-          alert('❌ Failed to mark attendance. Please try again.');
+          //console.error('Error marking attendance:', err);
+          //alert('❌ Failed to mark attendance. Please try again.');
         }
       });
   }

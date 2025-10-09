@@ -1,1 +1,417 @@
-<p>general-department works!</p>
+<div *ngIf="isLoggedIn" class="max-w-6xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+ <div class="flex items-center justify-between mb-6">
+   <h2 class="text-3xl font-bold text-blue-900">General Medicine Department</h2>
+   <div class="text-sm text-gray-600">
+     <span class="font-semibold">Doctor:</span> {{ consultationData.consultingDoctor }} |
+     <span class="font-semibold">Date:</span> {{ consultationData.consultationDate }}
+   </div>
+ </div>
+
+ <!-- Progress Steps -->
+ <div class="flex items-center justify-center mb-8 space-x-4">
+   <div [class]="activeSection === 'patient-info' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
+        class="px-4 py-2 rounded-full text-sm font-semibold">
+     1. Patient Info
+   </div>
+   <div class="w-12 h-0.5 bg-gray-300"></div>
+   <div [class]="activeSection === 'consultation' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
+        class="px-4 py-2 rounded-full text-sm font-semibold">
+     2. Consultation
+   </div>
+   <div class="w-12 h-0.5 bg-gray-300"></div>
+   <div [class]="activeSection === 'vitals' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
+        class="px-4 py-2 rounded-full text-sm font-semibold">
+     3. Vital Signs
+   </div>
+   <div class="w-12 h-0.5 bg-gray-300"></div>
+   <div [class]="activeSection === 'examination' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
+        class="px-4 py-2 rounded-full text-sm font-semibold">
+     4. Examination
+   </div>
+   <div class="w-12 h-0.5 bg-gray-300"></div>
+   <div [class]="activeSection === 'treatment' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
+        class="px-4 py-2 rounded-full text-sm font-semibold">
+     5. Treatment
+   </div>
+ </div>
+
+ <!-- Success and Error Messages -->
+ <div *ngIf="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+   {{ successMessage }}
+ </div>
+ <div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+   {{ errorMessage }}
+ </div>
+
+ <form (ngSubmit)="submitConsultation()">
+   <!-- Section 1: Patient Information -->
+   <div *ngIf="activeSection === 'patient-info'" class="space-y-6">
+     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Patient Information</h3>
+
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">
+           Patient ID <span [ngClass]="getAsteriskClass('patientId')" class="text-lg">*</span>
+         </label>
+         <input type="text" [(ngModel)]="consultationData.patientId" name="patientId" required
+                (input)="onFieldChange('patientId')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">
+           Full Name <span [ngClass]="getAsteriskClass('patientName')" class="text-lg">*</span>
+         </label>
+         <input type="text" [(ngModel)]="consultationData.patientName" name="patientName" required
+                (input)="onFieldChange('patientName')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">
+           Age <span [ngClass]="getAsteriskClass('age')" class="text-lg">*</span>
+         </label>
+         <input type="number" [(ngModel)]="consultationData.age" name="age" min="1" max="150" required
+                (input)="onFieldChange('age')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">
+           Gender <span [ngClass]="getAsteriskClass('gender')" class="text-lg">*</span>
+         </label>
+         <select [(ngModel)]="consultationData.gender" name="gender" required
+                 (change)="onFieldChange('gender')"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+           <option value="">Select Gender</option>
+           <option>Male</option>
+           <option>Female</option>
+           <option>Other</option>
+         </select>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
+         <input type="tel" [(ngModel)]="consultationData.phone" name="phone"
+                (input)="onFieldChange('phone')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Email</label>
+         <input type="email" [(ngModel)]="consultationData.email" name="email"
+                (input)="onFieldChange('email')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+     </div>
+
+     <div>
+       <label class="block text-gray-700 font-semibold mb-2">Address</label>
+       <textarea [(ngModel)]="consultationData.address" name="address" rows="2"
+                 (input)="onFieldChange('address')"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+     </div>
+
+     <div class="flex justify-end">
+       <button type="button" (click)="nextSection('patient-info')"
+               [disabled]="!isSectionValid('patient-info')"
+               [class]="isSectionValid('patient-info') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+               class="text-white px-6 py-2 rounded-lg transition duration-200">
+         Next: Consultation Details
+       </button>
+     </div>
+   </div>
+
+   <!-- Section 2: Consultation Details -->
+   <div *ngIf="activeSection === 'consultation'" class="space-y-6">
+     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Consultation Details</h3>
+
+     <div>
+       <label class="block text-gray-700 font-semibold mb-2">
+         Chief Complaint <span [ngClass]="getAsteriskClass('chiefComplaint')" class="text-lg">*</span>
+       </label>
+       <textarea [(ngModel)]="consultationData.chiefComplaint" name="chiefComplaint" rows="3" required
+                 (input)="onFieldChange('chiefComplaint')"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                 placeholder="Main reason for visit..."></textarea>
+
+       <!-- Quick Symptom Selection -->
+       <div class="mt-2">
+         <label class="block text-sm text-gray-600 mb-2">Quick Add Symptoms:</label>
+         <div class="flex flex-wrap gap-2">
+           <button *ngFor="let symptom of commonSymptoms" type="button"
+                   (click)="addSymptom(symptom)"
+                   class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full">
+             {{ symptom }}
+           </button>
+         </div>
+       </div>
+     </div>
+
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">History of Present Illness</label>
+         <textarea [(ngModel)]="consultationData.historyOfPresentIllness" name="historyOfPresentIllness" rows="3"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Past Medical History</label>
+         <textarea [(ngModel)]="consultationData.pastMedicalHistory" name="pastMedicalHistory" rows="3"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Current Medications</label>
+         <textarea [(ngModel)]="consultationData.currentMedications" name="currentMedications" rows="2"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Allergies</label>
+         <textarea [(ngModel)]="consultationData.allergies" name="allergies" rows="2"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                   placeholder="Drug allergies, food allergies, etc."></textarea>
+       </div>
+     </div>
+
+     <div class="flex justify-between">
+       <button type="button" (click)="prevSection('consultation')"
+               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+         Previous
+       </button>
+       <button type="button" (click)="nextSection('consultation')"
+               [disabled]="!isSectionValid('consultation')"
+               [class]="isSectionValid('consultation') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
+               class="text-white px-6 py-2 rounded-lg transition duration-200">
+         Next: Vital Signs
+       </button>
+     </div>
+   </div>
+
+   <!-- Section 3: Vital Signs -->
+   <div *ngIf="activeSection === 'vitals'" class="space-y-6">
+     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Vital Signs</h3>
+
+     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Blood Pressure (mmHg)</label>
+         <input type="text" [(ngModel)]="consultationData.bloodPressure" name="bloodPressure"
+                (input)="onFieldChange('bloodPressure')"
+                placeholder="e.g., 120/80"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Temperature (°C)</label>
+         <input type="number" [(ngModel)]="consultationData.temperature" name="temperature" step="0.1"
+                (input)="onFieldChange('temperature')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Pulse (bpm)</label>
+         <input type="number" [(ngModel)]="consultationData.pulse" name="pulse"
+                (input)="onFieldChange('pulse')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Respiratory Rate (breaths/min)</label>
+         <input type="number" [(ngModel)]="consultationData.respiratoryRate" name="respiratoryRate"
+                (input)="onFieldChange('respiratoryRate')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Oxygen Saturation (%)</label>
+         <input type="number" [(ngModel)]="consultationData.oxygenSaturation" name="oxygenSaturation" min="0" max="100"
+                (input)="onFieldChange('oxygenSaturation')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Weight (kg)</label>
+         <input type="number" [(ngModel)]="consultationData.weight" name="weight" step="0.1"
+                (input)="onFieldChange('weight')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Height (cm)</label>
+         <input type="number" [(ngModel)]="consultationData.height" name="height"
+                (input)="onFieldChange('height')"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+       </div>
+       <div *ngIf="calculateBMI() > 0">
+         <label class="block text-gray-700 font-semibold mb-2">BMI</label>
+         <div class="w-full px-4 py-2 border rounded-lg bg-gray-100 text-center font-semibold">
+           {{ calculateBMI() }}
+           <span *ngIf="calculateBMI() < 18.5" class="text-blue-600 ml-2">(Underweight)</span>
+           <span *ngIf="calculateBMI() >= 18.5 && calculateBMI() < 25" class="text-green-600 ml-2">(Normal)</span>
+           <span *ngIf="calculateBMI() >= 25 && calculateBMI() < 30" class="text-yellow-600 ml-2">(Overweight)</span>
+           <span *ngIf="calculateBMI() >= 30" class="text-red-600 ml-2">(Obese)</span>
+         </div>
+       </div>
+     </div>
+
+     <div class="flex justify-between">
+       <button type="button" (click)="prevSection('vitals')"
+               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+         Previous
+       </button>
+       <button type="button" (click)="nextSection('vitals')"
+               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+         Next: Physical Examination
+       </button>
+     </div>
+   </div>
+
+   <!-- Section 4: Physical Examination -->
+   <div *ngIf="activeSection === 'examination'" class="space-y-6">
+     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Physical Examination</h3>
+
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">General Appearance</label>
+         <textarea [(ngModel)]="consultationData.generalAppearance" name="generalAppearance" rows="2"
+                   (input)="onFieldChange('generalAppearance')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Cardiovascular</label>
+         <textarea [(ngModel)]="consultationData.cardiovascular" name="cardiovascular" rows="2"
+                   (input)="onFieldChange('cardiovascular')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Respiratory</label>
+         <textarea [(ngModel)]="consultationData.respiratory" name="respiratory" rows="2"
+                   (input)="onFieldChange('respiratory')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Abdominal</label>
+         <textarea [(ngModel)]="consultationData.abdominal" name="abdominal" rows="2"
+                   (input)="onFieldChange('abdominal')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div class="md:col-span-2">
+         <label class="block text-gray-700 font-semibold mb-2">Neurological</label>
+         <textarea [(ngModel)]="consultationData.neurological" name="neurological" rows="2"
+                   (input)="onFieldChange('neurological')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+     </div>
+
+     <div class="flex justify-between">
+       <button type="button" (click)="prevSection('examination')"
+               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+         Previous
+       </button>
+       <button type="button" (click)="nextSection('examination')"
+               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+         Next: Assessment & Treatment
+       </button>
+     </div>
+   </div>
+
+   <!-- Section 5: Assessment & Treatment -->
+   <div *ngIf="activeSection === 'treatment'" class="space-y-6">
+     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Assessment & Treatment Plan</h3>
+
+     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">
+           Diagnosis <span [ngClass]="getAsteriskClass('diagnosis')" class="text-lg">*</span>
+         </label>
+         <textarea [(ngModel)]="consultationData.diagnosis" name="diagnosis" rows="3" required
+                   (input)="onFieldChange('diagnosis')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+
+         <!-- Quick Diagnosis Selection -->
+         <div class="mt-2">
+           <label class="block text-sm text-gray-600 mb-2">Quick Add Conditions:</label>
+           <div class="flex flex-wrap gap-2">
+             <button *ngFor="let condition of commonConditions" type="button"
+                     (click)="setDiagnosis(condition)"
+                     class="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded">
+               {{ condition }}
+             </button>
+           </div>
+         </div>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Treatment Plan</label>
+         <textarea [(ngModel)]="consultationData.treatmentPlan" name="treatmentPlan" rows="3"
+                   (input)="onFieldChange('treatmentPlan')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Medications</label>
+         <textarea [(ngModel)]="consultationData.medications" name="medications" rows="3"
+                   (input)="onFieldChange('medications')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+
+         <!-- Quick Medication Selection -->
+         <div class="mt-2">
+           <label class="block text-sm text-gray-600 mb-2">Quick Add Medications:</label>
+           <div class="flex flex-wrap gap-2">
+             <button *ngFor="let medication of commonMedications" type="button"
+                     (click)="addMedication(medication)"
+                     class="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded">
+               {{ medication }}
+             </button>
+           </div>
+         </div>
+       </div>
+       <div>
+         <label class="block text-gray-700 font-semibold mb-2">Follow-up Instructions</label>
+         <textarea [(ngModel)]="consultationData.followUpInstructions" name="followUpInstructions" rows="3"
+                   (input)="onFieldChange('followUpInstructions')"
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+       </div>
+     </div>
+
+     <!-- Referral Section -->
+     <div class="border-t pt-6">
+       <div class="flex items-center space-x-4 mb-4">
+         <input type="checkbox" [(ngModel)]="consultationData.referralNeeded" name="referralNeeded" id="referralNeeded">
+         <label for="referralNeeded" class="text-gray-700 font-semibold">Referral Needed</label>
+       </div>
+
+       <div *ngIf="consultationData.referralNeeded">
+         <label class="block text-gray-700 font-semibold mb-2">Referral Department</label>
+         <select [(ngModel)]="consultationData.referralDepartment" name="referralDepartment"
+                 (change)="onFieldChange('referralDepartment')"
+                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+           <option value="">Select Department</option>
+           <option>Cardiology</option>
+           <option>Emergency</option>
+           <option>Laboratory</option>
+           <option>Pediatrics</option>
+           <option>Pharmacy</option>
+           <option>Surgery</option>
+         </select>
+       </div>
+     </div>
+
+     <!-- Urgency Level -->
+     <div>
+       <label class="block text-gray-700 font-semibold mb-2">Consultation Urgency</label>
+       <select [(ngModel)]="consultationData.urgency" name="urgency"
+               (change)="onFieldChange('urgency')"
+               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+         <option value="routine">Routine</option>
+         <option value="urgent">Urgent</option>
+         <option value="emergency">Emergency</option>
+       </select>
+     </div>
+
+     <div class="flex justify-between">
+       <button type="button" (click)="prevSection('treatment')"
+               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
+         Previous
+       </button>
+       <div class="space-x-4">
+         <button type="button" (click)="printConsultation()"
+                 class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+           Print Consultation
+         </button>
+         <button type="submit" [disabled]="isLoading || !isSectionValid('treatment')"
+                 [class]="isLoading || !isSectionValid('treatment') ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'"
+                 class="text-white px-6 py-2 rounded-lg transition duration-200">
+           <span *ngIf="isLoading">Saving...</span>
+           <span *ngIf="!isLoading">Save Consultation</span>
+         </button>
+       </div>
+     </div>
+   </div>
+ </form>
+</div>

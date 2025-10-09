@@ -35,6 +35,9 @@ export class AddDoctor implements OnInit {
   successMessage = '';
   isLoading = false;
 
+  // Field validation states for asterisk colors
+  fieldStates: { [key: string]: boolean } = {};
+
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -47,6 +50,9 @@ export class AddDoctor implements OnInit {
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     }
+
+    // Initialize field states
+    this.initializeFieldStates();
   }
 
   onSubmit() {
@@ -105,5 +111,31 @@ export class AddDoctor implements OnInit {
       email: '',
       address: ''
     };
+    // Reset all field states when form is reset
+    this.initializeFieldStates();
+  }
+
+  // Initialize field states
+  initializeFieldStates() {
+    this.fieldStates = {};
+  }
+
+  // Check if field is filled (not empty)
+  isFieldFilled(fieldName: string): boolean {
+    const value = this.doctorData[fieldName as keyof typeof this.doctorData];
+    return value !== null && value !== undefined && String(value).trim() !== '';
+  }
+
+  // Update field state when input changes
+  onFieldChange(fieldName: string) {
+    this.fieldStates[fieldName] = this.isFieldFilled(fieldName);
+  }
+
+  // Get CSS class for asterisk based on field state
+  getAsteriskClass(fieldName: string): string {
+    if (this.fieldStates[fieldName] === undefined) {
+      return 'text-red-500'; // Default to red for empty fields
+    }
+    return this.fieldStates[fieldName] ? 'text-green-500' : 'text-red-500';
   }
 }
