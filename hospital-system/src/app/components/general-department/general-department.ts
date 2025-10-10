@@ -63,26 +63,23 @@ export class GeneralDepartment implements OnInit {
    urgency: 'routine'
  };
 
- // Common symptoms and conditions
- commonSymptoms = [
-   'Fever', 'Cough', 'Headache', 'Fatigue', 'Nausea', 'Vomiting',
-   'Diarrhea', 'Constipation', 'Chest Pain', 'Shortness of Breath',
-   'Abdominal Pain', 'Back Pain', 'Joint Pain', 'Skin Rash',
-   'Dizziness', 'Insomnia', 'Loss of Appetite'
- ];
+ // API data
+ patients: any[] = [];
+ medicines: any[] = [];
 
- commonConditions = [
-   'Upper Respiratory Infection', 'Hypertension', 'Diabetes Mellitus',
-   'Gastroenteritis', 'Urinary Tract Infection', 'Anxiety',
-   'Depression', 'Asthma', 'Allergic Rhinitis', 'Dermatitis',
-   'Arthritis', 'Migraine', 'Anemia', 'Thyroid Disorders'
- ];
+ // Only symptoms from API
+ symptoms: any[] = [];
 
- commonMedications = [
-   'Paracetamol', 'Ibuprofen', 'Aspirin', 'Amoxicillin',
-   'Cetirizine', 'Omeprazole', 'Metformin', 'Amlodipine',
-   'Salbutamol', 'Prednisolone', 'Vitamin D', 'Iron Supplements'
- ];
+ // Form data for adding new items
+ newSymptom = '';
+
+ // UI state for management sections
+ showSymptomManagement = false;
+ showPatientSearch = false;
+
+ // Loading states for API calls
+ loadingSymptoms = false;
+ savingSymptom = false;
 
  // UI state
  errorMessage = '';
@@ -92,8 +89,8 @@ export class GeneralDepartment implements OnInit {
  showExaminationSection = false;
  showTreatmentSection = false;
 
- // Form sections visibility
- activeSection = 'patient-info';
+ // Form sections visibility - Show all sections at once
+ showAllSections = true;
 
  // Field validation states for asterisk colors
  fieldStates: { [key: string]: boolean } = {};
@@ -125,6 +122,11 @@ export class GeneralDepartment implements OnInit {
    // Initialize field states
    this.initializeFieldStates();
 
+   // Load data from APIs
+   this.loadPatients();
+   this.loadMedicines();
+   this.loadSymptoms();
+
    // Debug: Log initial diagnosis field state
    console.log('Initial diagnosis field state:', {
      value: this.consultationData.diagnosis,
@@ -138,39 +140,19 @@ export class GeneralDepartment implements OnInit {
    return 'Dr. General Physician';
  }
 
- // Section navigation
- nextSection(currentSection: string) {
-   switch(currentSection) {
-     case 'patient-info':
-       this.activeSection = 'consultation';
-       break;
-     case 'consultation':
-       this.activeSection = 'vitals';
-       break;
-     case 'vitals':
-       this.activeSection = 'examination';
-       break;
-     case 'examination':
-       this.activeSection = 'treatment';
-       break;
+ // Get display value for fields (show "none" for empty fields)
+ getDisplayValue(fieldName: string): string {
+   const value = this.consultationData[fieldName as keyof typeof this.consultationData];
+   if (value === null || value === undefined || String(value).trim() === '') {
+     return 'none';
    }
+   return String(value);
  }
 
- prevSection(currentSection: string) {
-   switch(currentSection) {
-     case 'consultation':
-       this.activeSection = 'patient-info';
-       break;
-     case 'vitals':
-       this.activeSection = 'consultation';
-       break;
-     case 'examination':
-       this.activeSection = 'vitals';
-       break;
-     case 'treatment':
-       this.activeSection = 'examination';
-       break;
-   }
+ // Get display value for boolean fields
+ getBooleanDisplayValue(fieldName: string): string {
+   const value = this.consultationData[fieldName as keyof typeof this.consultationData];
+   return value ? 'Yes' : 'No';
  }
 
  // Quick symptom selection
@@ -190,10 +172,23 @@ export class GeneralDepartment implements OnInit {
 
  // Quick medication addition
  addMedication(medication: string) {
-   const current = this.consultationData.medications;
-   this.consultationData.medications = current ? `${current}, ${medication}` : medication;
-   // Update field state when medication is added via quick-select
-   this.onFieldChange('medications');
+   if (medication && medication.trim()) {
+     const current = this.consultationData.medications;
+     const newValue = current ? `${current}, ${medication}` : medication;
+     this.consultationData.medications = newValue;
+
+     // Update field state when medication is added via quick-select
+     this.onFieldChange('medications');
+   }
+ }
+
+ // Handle medication selection from dropdown
+ onMedicationSelect(event: any) {
+   const target = event.target as HTMLSelectElement;
+   if (target && target.value && target.value.trim()) {
+     this.addMedication(target.value);
+     target.value = ''; // Reset selection
+   }
  }
 
  // Calculate BMI
@@ -283,7 +278,6 @@ export class GeneralDepartment implements OnInit {
      consultingDoctor: this.getCurrentDoctorName(),
      urgency: 'routine'
    };
-   this.activeSection = 'patient-info';
    // Reset all field states when form is reset
    this.initializeFieldStates();
  }
@@ -364,6 +358,181 @@ export class GeneralDepartment implements OnInit {
    return this.areRequiredFieldsFilled(section);
  }
 
+ // Check if all required fields across all sections are filled
+ areAllRequiredFieldsFilled(): boolean {
+   const allSections = Object.keys(this.requiredFieldsBySection);
+   return allSections.every(section => this.areRequiredFieldsFilled(section));
+ }
+
+ // Check if form is valid for saving/printing
+ isFormValid(): boolean {
+   return this.areAllRequiredFieldsFilled();
+ }
+
+ // API Integration Methods
+ loadPatients() {
+   this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-patients.php')
+     .subscribe({
+       next: (response: any) => {
+         // Handle both array response and object response with patients property
+         if (Array.isArray(response)) {
+           this.patients = response;
+         } else if (response && response.patients) {
+           this.patients = response.patients;
+         } else {
+           this.patients = [];
+         }
+       },
+       error: (err) => {
+         console.error('Error loading patients:', err);
+         this.patients = [];
+       }
+     });
+ }
+
+ loadMedicines() {
+   console.log('Loading medicines from API...');
+   this.http.get('https://kilnenterprise.com/presbyterian-hospital/medicines.php')
+     .subscribe({
+       next: (response: any) => {
+         console.log('Raw medicines API response:', response);
+
+         // Handle both array response and object response with medicines property
+         if (Array.isArray(response)) {
+           this.medicines = response;
+         } else if (response && response.medicines) {
+           this.medicines = response.medicines;
+         } else {
+           this.medicines = [];
+         }
+
+         console.log('Processed medicines array:', this.medicines);
+         console.log('Total medicines loaded:', this.medicines.length);
+       },
+       error: (err) => {
+         console.error('Error loading medicines:', err);
+         this.medicines = [];
+       }
+     });
+ }
+
+ // API-based Management for Symptoms and Conditions
+ loadSymptoms() {
+   this.loadingSymptoms = true;
+   this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-symptoms.php')
+     .subscribe({
+       next: (response: any) => {
+         this.loadingSymptoms = false;
+         if (response.success) {
+           this.symptoms = response.symptoms || [];
+         } else {
+           console.error('Error loading symptoms:', response.message);
+           this.symptoms = [];
+         }
+       },
+       error: (err) => {
+         this.loadingSymptoms = false;
+         console.error('Error loading symptoms:', err);
+         this.symptoms = [];
+       }
+     });
+ }
+
+
+ // Add new symptom to database
+ addCustomSymptom() {
+   if (!this.newSymptom.trim()) {
+     return;
+   }
+
+   this.savingSymptom = true;
+   this.http.post('https://kilnenterprise.com/presbyterian-hospital/add-symptom.php', {
+     name: this.newSymptom.trim()
+   }).subscribe({
+     next: (response: any) => {
+       this.savingSymptom = false;
+       if (response.success) {
+         // Reload symptoms to include the new one
+         this.loadSymptoms();
+         this.newSymptom = '';
+       } else {
+         console.error('Error adding symptom:', response.message);
+         alert('Error: ' + response.message);
+       }
+     },
+     error: (err) => {
+       this.savingSymptom = false;
+       console.error('Error adding symptom:', err);
+       alert('Error adding symptom. Please try again.');
+     }
+   });
+ }
+
+
+ // Get all symptoms from database
+ getAllSymptoms() {
+   return this.symptoms.map(s => s.name);
+ }
+
+
+ // Check if symptom is user-added (has ID > 0)
+ isUserAddedSymptom(symptom: string): boolean {
+   return this.symptoms.some(s => s.name === symptom && s.id > 0);
+ }
+
+
+ // Patient search functionality
+ searchPatient(query: string) {
+   if (!query.trim()) {
+     return [];
+   }
+   return this.patients.filter(patient =>
+     patient.ghana_card_number?.toLowerCase().includes(query.toLowerCase()) ||
+     patient.first_name?.toLowerCase().includes(query.toLowerCase()) ||
+     patient.last_name?.toLowerCase().includes(query.toLowerCase()) ||
+     patient.phone_number?.toLowerCase().includes(query.toLowerCase())
+   );
+ }
+
+ // Select patient from search results
+ selectPatient(patient: any) {
+   // Map API fields to frontend fields
+   this.consultationData.patientId = patient.ghana_card_number || patient.id || '';
+   this.consultationData.patientName = `${patient.first_name || ''} ${patient.last_name || ''}`.trim();
+   this.consultationData.age = this.calculateAge(patient.date_of_birth) || '';
+   this.consultationData.gender = patient.gender || '';
+   this.consultationData.phone = patient.phone_number || '';
+   this.consultationData.email = patient.email || '';
+   this.consultationData.address = patient.residential_address || '';
+
+   // Update field states for patient info
+   this.onFieldChange('patientId');
+   this.onFieldChange('patientName');
+   this.onFieldChange('age');
+   this.onFieldChange('gender');
+   this.onFieldChange('phone');
+   this.onFieldChange('email');
+   this.onFieldChange('address');
+
+   this.showPatientSearch = false;
+ }
+
+ // Calculate age from date of birth
+ calculateAge(dateOfBirth: string): string {
+   if (!dateOfBirth) return '';
+
+   const birthDate = new Date(dateOfBirth);
+   const today = new Date();
+   let age = today.getFullYear() - birthDate.getFullYear();
+   const monthDiff = today.getMonth() - birthDate.getMonth();
+
+   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+     age--;
+   }
+
+   return age.toString();
+ }
+
  // Debug method to check diagnosis field state (can be called from console)
  debugDiagnosisField() {
    console.log('=== DIAGNOSIS FIELD DEBUG ===');
@@ -382,4 +551,5 @@ export class GeneralDepartment implements OnInit {
      sectionValid: this.isSectionValid('treatment')
    };
  }
+
 }

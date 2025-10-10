@@ -345,12 +345,91 @@
     display: none !important;
   }
 
+  /* Hide all input elements and interactive components */
+  input, textarea, select, button, .btn {
+    display: none !important;
+  }
+
+  /* Show data in clean format */
   .form-section {
     box-shadow: none;
     border: 1px solid #ccc;
+    page-break-inside: avoid;
+    margin-bottom: 1rem;
   }
 
-  .btn {
+  .section-title {
+    color: #000 !important;
+    border-bottom: 2px solid #000;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .form-label {
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 0.25rem;
+    display: block;
+  }
+
+  /* Show field values in a clean text format */
+  .form-group {
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  /* For empty fields, show "none" */
+  .form-group:empty::after {
+    content: "none";
+    color: #666;
+    font-style: italic;
+  }
+
+  /* Ensure grid layouts work for print */
+  .form-grid {
+    display: block;
+  }
+
+  .form-grid > * {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Print-friendly colors */
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Page break controls */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-after {
+    page-break-after: always;
+  }
+
+  /* Remove background colors and gradients */
+  .general-department-container,
+  .department-header,
+  .form-section {
+    background: white !important;
+    color: black !important;
+  }
+
+  /* Print-only elements */
+  .print-only {
+    display: none;
+  }
+}
+
+/* Show print-only elements when printing */
+@media print {
+  .print-only {
+    display: block !important;
+  }
+
+  .no-print {
     display: none !important;
   }
 }

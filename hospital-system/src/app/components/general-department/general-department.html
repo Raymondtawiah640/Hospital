@@ -7,32 +7,10 @@
    </div>
  </div>
 
- <!-- Progress Steps -->
- <div class="flex items-center justify-center mb-8 space-x-4">
-   <div [class]="activeSection === 'patient-info' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
-        class="px-4 py-2 rounded-full text-sm font-semibold">
-     1. Patient Info
-   </div>
-   <div class="w-12 h-0.5 bg-gray-300"></div>
-   <div [class]="activeSection === 'consultation' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
-        class="px-4 py-2 rounded-full text-sm font-semibold">
-     2. Consultation
-   </div>
-   <div class="w-12 h-0.5 bg-gray-300"></div>
-   <div [class]="activeSection === 'vitals' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
-        class="px-4 py-2 rounded-full text-sm font-semibold">
-     3. Vital Signs
-   </div>
-   <div class="w-12 h-0.5 bg-gray-300"></div>
-   <div [class]="activeSection === 'examination' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
-        class="px-4 py-2 rounded-full text-sm font-semibold">
-     4. Examination
-   </div>
-   <div class="w-12 h-0.5 bg-gray-300"></div>
-   <div [class]="activeSection === 'treatment' ? 'bg-blue-600 text-white' : 'bg-gray-300'"
-        class="px-4 py-2 rounded-full text-sm font-semibold">
-     5. Treatment
-   </div>
+ <!-- All Sections Header -->
+ <div class="mb-8">
+   <h3 class="text-lg font-semibold text-blue-800 text-center">Complete Consultation Form</h3>
+   <p class="text-sm text-gray-600 text-center mt-2">Fill in all sections below.</p>
  </div>
 
  <!-- Success and Error Messages -->
@@ -43,19 +21,44 @@
    {{ errorMessage }}
  </div>
 
+
  <form (ngSubmit)="submitConsultation()">
    <!-- Section 1: Patient Information -->
-   <div *ngIf="activeSection === 'patient-info'" class="space-y-6">
-     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Patient Information</h3>
+   <div class="space-y-6 mb-8 p-6 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">1. Patient Information</h3>
 
      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
        <div>
          <label class="block text-gray-700 font-semibold mb-2">
            Patient ID <span [ngClass]="getAsteriskClass('patientId')" class="text-lg">*</span>
          </label>
-         <input type="text" [(ngModel)]="consultationData.patientId" name="patientId" required
-                (input)="onFieldChange('patientId')"
-                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+         <div class="flex gap-2">
+           <input type="text" [(ngModel)]="consultationData.patientId" name="patientId" required
+                  (input)="onFieldChange('patientId')"
+                  class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+           <button type="button" (click)="showPatientSearch = !showPatientSearch"
+                   class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 no-print">
+             Search
+           </button>
+         </div>
+
+         <!-- Print version - show Ghana Card Number -->
+         <div class="print-only font-medium text-gray-900">
+           {{ consultationData.patientId || 'Not specified' }}
+         </div>
+
+         <!-- Patient Search Results -->
+         <div *ngIf="showPatientSearch" class="absolute z-10 mt-1 w-96 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+           <div *ngFor="let patient of searchPatient(consultationData.patientId)" (click)="selectPatient(patient)"
+                class="p-3 hover:bg-gray-50 cursor-pointer border-b">
+             <div class="font-semibold">{{ patient.first_name }} {{ patient.last_name }}</div>
+             <div class="text-sm text-gray-600">ID: {{ patient.ghana_card_number }} | Age: {{ calculateAge(patient.date_of_birth) }} | {{ patient.phone_number }}</div>
+           </div>
+           <div *ngIf="searchPatient(consultationData.patientId).length === 0 && consultationData.patientId.length > 0"
+                class="p-3 text-gray-500">
+             No patients found
+           </div>
+         </div>
        </div>
        <div>
          <label class="block text-gray-700 font-semibold mb-2">
@@ -64,6 +67,11 @@
          <input type="text" [(ngModel)]="consultationData.patientName" name="patientName" required
                 (input)="onFieldChange('patientName')"
                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ consultationData.patientName || 'Not specified' }}
+         </div>
        </div>
        <div>
          <label class="block text-gray-700 font-semibold mb-2">
@@ -72,6 +80,11 @@
          <input type="number" [(ngModel)]="consultationData.age" name="age" min="1" max="150" required
                 (input)="onFieldChange('age')"
                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ consultationData.age || 'Not specified' }}
+         </div>
        </div>
        <div>
          <label class="block text-gray-700 font-semibold mb-2">
@@ -85,18 +98,33 @@
            <option>Female</option>
            <option>Other</option>
          </select>
+
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ consultationData.gender || 'Not specified' }}
+         </div>
        </div>
        <div>
          <label class="block text-gray-700 font-semibold mb-2">Phone Number</label>
          <input type="tel" [(ngModel)]="consultationData.phone" name="phone"
                 (input)="onFieldChange('phone')"
                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ consultationData.phone || 'Not specified' }}
+         </div>
        </div>
        <div>
          <label class="block text-gray-700 font-semibold mb-2">Email</label>
          <input type="email" [(ngModel)]="consultationData.email" name="email"
                 (input)="onFieldChange('email')"
                 class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ consultationData.email || 'Not specified' }}
+         </div>
        </div>
      </div>
 
@@ -105,21 +133,17 @@
        <textarea [(ngModel)]="consultationData.address" name="address" rows="2"
                  (input)="onFieldChange('address')"
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
-     </div>
 
-     <div class="flex justify-end">
-       <button type="button" (click)="nextSection('patient-info')"
-               [disabled]="!isSectionValid('patient-info')"
-               [class]="isSectionValid('patient-info') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
-               class="text-white px-6 py-2 rounded-lg transition duration-200">
-         Next: Consultation Details
-       </button>
+       <!-- Print version -->
+       <div class="print-only font-medium text-gray-900">
+         {{ consultationData.address || 'Not specified' }}
+       </div>
      </div>
    </div>
 
    <!-- Section 2: Consultation Details -->
-   <div *ngIf="activeSection === 'consultation'" class="space-y-6">
-     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Consultation Details</h3>
+   <div class="space-y-6 mb-8 p-6 bg-green-50 rounded-lg border-l-4 border-green-400">
+     <h3 class="text-xl font-semibold text-green-800 border-b pb-2">2. Consultation Details</h3>
 
      <div>
        <label class="block text-gray-700 font-semibold mb-2">
@@ -130,15 +154,54 @@
                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                  placeholder="Main reason for visit..."></textarea>
 
+       <!-- Print version -->
+       <div class="print-only font-medium text-gray-900">
+         {{ getDisplayValue('chiefComplaint') }}
+       </div>
+
        <!-- Quick Symptom Selection -->
        <div class="mt-2">
-         <label class="block text-sm text-gray-600 mb-2">Quick Add Symptoms:</label>
+         <div class="flex items-center justify-between mb-2">
+           <label class="block text-sm text-gray-600">Quick Add Symptoms:</label>
+           <button type="button" (click)="showSymptomManagement = !showSymptomManagement"
+                   class="text-xs text-blue-600 hover:text-blue-800">
+             Manage Symptoms
+           </button>
+         </div>
          <div class="flex flex-wrap gap-2">
-           <button *ngFor="let symptom of commonSymptoms" type="button"
+           <button *ngFor="let symptom of getAllSymptoms()" type="button"
                    (click)="addSymptom(symptom)"
-                   class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full">
+                   class="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full"
+                   [class.bg-blue-100]="isUserAddedSymptom(symptom)">
              {{ symptom }}
            </button>
+         </div>
+
+         <!-- Symptom Management Section -->
+         <div *ngIf="showSymptomManagement" class="mt-4 p-4 bg-gray-50 rounded-lg border">
+           <h4 class="font-semibold text-sm mb-3">Add Custom Symptom</h4>
+           <div class="flex gap-2 mb-3">
+             <input type="text" [(ngModel)]="newSymptom" placeholder="Enter symptom name"
+                    class="w-64 px-3 py-1 text-sm border rounded">
+             <button type="button" (click)="addCustomSymptom()"
+                     [disabled]="savingSymptom || !newSymptom.trim()"
+                     class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400">
+               <span *ngIf="savingSymptom">Adding...</span>
+               <span *ngIf="!savingSymptom">Add</span>
+             </button>
+           </div>
+           <div *ngIf="loadingSymptoms" class="text-center py-2">
+             <span class="text-sm text-gray-600">Loading symptoms...</span>
+           </div>
+           <div class="space-y-2">
+             <h5 class="font-medium text-xs text-gray-700">User-Added Symptoms:</h5>
+             <div class="flex flex-wrap gap-2">
+               <span *ngFor="let symptom of symptoms"
+                     class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                 {{ symptom.name }}
+               </span>
+             </div>
+           </div>
          </div>
        </div>
      </div>
@@ -166,24 +229,11 @@
                    placeholder="Drug allergies, food allergies, etc."></textarea>
        </div>
      </div>
-
-     <div class="flex justify-between">
-       <button type="button" (click)="prevSection('consultation')"
-               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
-         Previous
-       </button>
-       <button type="button" (click)="nextSection('consultation')"
-               [disabled]="!isSectionValid('consultation')"
-               [class]="isSectionValid('consultation') ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'"
-               class="text-white px-6 py-2 rounded-lg transition duration-200">
-         Next: Vital Signs
-       </button>
-     </div>
    </div>
 
    <!-- Section 3: Vital Signs -->
-   <div *ngIf="activeSection === 'vitals'" class="space-y-6">
-     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Vital Signs</h3>
+   <div class="space-y-6 mb-8 p-6 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+     <h3 class="text-xl font-semibold text-purple-800 border-b pb-2">3. Vital Signs</h3>
 
      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
        <div>
@@ -240,22 +290,11 @@
          </div>
        </div>
      </div>
-
-     <div class="flex justify-between">
-       <button type="button" (click)="prevSection('vitals')"
-               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
-         Previous
-       </button>
-       <button type="button" (click)="nextSection('vitals')"
-               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-         Next: Physical Examination
-       </button>
-     </div>
    </div>
 
    <!-- Section 4: Physical Examination -->
-   <div *ngIf="activeSection === 'examination'" class="space-y-6">
-     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Physical Examination</h3>
+   <div class="space-y-6 mb-8 p-6 bg-orange-50 rounded-lg border-l-4 border-orange-400">
+     <h3 class="text-xl font-semibold text-orange-800 border-b pb-2">4. Physical Examination</h3>
 
      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
        <div>
@@ -289,22 +328,11 @@
                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
        </div>
      </div>
-
-     <div class="flex justify-between">
-       <button type="button" (click)="prevSection('examination')"
-               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
-         Previous
-       </button>
-       <button type="button" (click)="nextSection('examination')"
-               class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
-         Next: Assessment & Treatment
-       </button>
-     </div>
    </div>
 
    <!-- Section 5: Assessment & Treatment -->
-   <div *ngIf="activeSection === 'treatment'" class="space-y-6">
-     <h3 class="text-xl font-semibold text-blue-800 border-b pb-2">Assessment & Treatment Plan</h3>
+   <div class="space-y-6 mb-8 p-6 bg-teal-50 rounded-lg border-l-4 border-teal-400">
+     <h3 class="text-xl font-semibold text-teal-800 border-b pb-2">5. Assessment & Treatment Plan</h3>
 
      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
        <div>
@@ -315,17 +343,11 @@
                    (input)="onFieldChange('diagnosis')"
                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
 
-         <!-- Quick Diagnosis Selection -->
-         <div class="mt-2">
-           <label class="block text-sm text-gray-600 mb-2">Quick Add Conditions:</label>
-           <div class="flex flex-wrap gap-2">
-             <button *ngFor="let condition of commonConditions" type="button"
-                     (click)="setDiagnosis(condition)"
-                     class="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded">
-               {{ condition }}
-             </button>
-           </div>
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ getDisplayValue('diagnosis') }}
          </div>
+
        </div>
        <div>
          <label class="block text-gray-700 font-semibold mb-2">Treatment Plan</label>
@@ -337,16 +359,30 @@
          <label class="block text-gray-700 font-semibold mb-2">Medications</label>
          <textarea [(ngModel)]="consultationData.medications" name="medications" rows="3"
                    (input)="onFieldChange('medications')"
-                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                   placeholder="Select medications from dropdown above..."></textarea>
 
-         <!-- Quick Medication Selection -->
+         <!-- Print version -->
+         <div class="print-only font-medium text-gray-900">
+           {{ getDisplayValue('medications') }}
+         </div>
+
+
+         <!-- Medication Selection from API -->
          <div class="mt-2">
-           <label class="block text-sm text-gray-600 mb-2">Quick Add Medications:</label>
+           <label class="block text-sm text-gray-600 mb-2">Select Medications:</label>
            <div class="flex flex-wrap gap-2">
-             <button *ngFor="let medication of commonMedications" type="button"
-                     (click)="addMedication(medication)"
-                     class="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded">
-               {{ medication }}
+             <select class="px-3 py-1 text-sm border rounded" (change)="onMedicationSelect($event)" #medSelect
+                     [disabled]="medicines.length === 0">
+               <option value="">Choose medication...</option>
+               <option *ngFor="let medicine of medicines" [value]="medicine.name">
+                 {{ medicine.name }} - ₱{{ medicine.price }} (Stock: {{ medicine.stock_quantity }})
+               </option>
+             </select>
+             <button type="button" (click)="medSelect.value = ''"
+                     class="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded"
+                     [disabled]="medicines.length === 0">
+               Clear
              </button>
            </div>
          </div>
@@ -394,24 +430,33 @@
        </select>
      </div>
 
-     <div class="flex justify-between">
-       <button type="button" (click)="prevSection('treatment')"
-               class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600">
-         Previous
-       </button>
-       <div class="space-x-4">
-         <button type="button" (click)="printConsultation()"
-                 class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
-           Print Consultation
-         </button>
-         <button type="submit" [disabled]="isLoading || !isSectionValid('treatment')"
-                 [class]="isLoading || !isSectionValid('treatment') ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'"
+     <!-- Action Buttons -->
+     <div class="border-t pt-6">
+       <div class="flex justify-between">
+         <div class="space-x-4">
+           <button type="button" (click)="printConsultation()"
+                   class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">
+             Print Consultation
+           </button>
+           <button type="button" (click)="resetForm()"
+                   class="bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700">
+             Reset Form
+           </button>
+         </div>
+         <button type="submit" [disabled]="isLoading || !isFormValid()"
+                 [class]="isLoading || !isFormValid() ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'"
                  class="text-white px-6 py-2 rounded-lg transition duration-200">
            <span *ngIf="isLoading">Saving...</span>
-           <span *ngIf="!isLoading">Save Consultation</span>
+           <span *ngIf="!isLoading && isFormValid()">Save Consultation</span>
+           <span *ngIf="!isLoading && !isFormValid()">Complete Required Fields</span>
          </button>
        </div>
      </div>
+   </div>
+
+   <!-- Management Sections (hidden during print) -->
+   <div class="no-print">
+     <!-- Only Symptom Management here -->
    </div>
  </form>
 </div>
