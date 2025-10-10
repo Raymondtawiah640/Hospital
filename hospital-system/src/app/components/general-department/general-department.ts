@@ -196,7 +196,14 @@ export class GeneralDepartment implements OnInit {
    if (this.consultationData.weight && this.consultationData.height) {
      const heightM = parseFloat(this.consultationData.height) / 100;
      const weight = parseFloat(this.consultationData.weight);
-     return parseFloat((weight / (heightM * heightM)).toFixed(1));
+
+     // Validate inputs
+     if (heightM > 0 && weight > 0 && heightM < 3 && weight < 1000) {
+       const bmi = weight / (heightM * heightM);
+       if (bmi > 0 && bmi < 100) { // Reasonable BMI range
+         return parseFloat(bmi.toFixed(1));
+       }
+     }
    }
    return 0;
  }
@@ -284,7 +291,31 @@ export class GeneralDepartment implements OnInit {
 
  // Print consultation
  printConsultation() {
-   window.print();
+   // Hide any URLs that might appear in print
+   const style = document.createElement('style');
+   style.textContent = `
+     @media print {
+       * { margin: 0 !important; padding: 0 !important; }
+       @page { margin: 0.25in; }
+       @page { @bottom-left { content: "" !important; } }
+       @page { @bottom-center { content: "" !important; } }
+       @page { @bottom-right { content: "" !important; } }
+       html::after, body::after { content: "" !important; display: none !important; }
+       *[class*="url"], *[id*="url"] { display: none !important; }
+       footer, .footer { display: none !important; }
+     }
+   `;
+   document.head.appendChild(style);
+
+   // Small delay to ensure styles are applied
+   setTimeout(() => {
+     window.print();
+
+     // Clean up the added styles after printing
+     setTimeout(() => {
+       document.head.removeChild(style);
+     }, 1000);
+   }, 100);
  }
 
  // Initialize field states
