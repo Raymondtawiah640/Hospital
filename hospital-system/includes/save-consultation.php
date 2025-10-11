@@ -11,7 +11,7 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
 
     // Validate required fields
-    $requiredFields = ['patient_id', 'doctor_id', 'symptoms', 'conditions', 'diagnosis'];
+    $requiredFields = ['patient_id', 'diagnosis'];
     foreach ($requiredFields as $field) {
         if (!isset($input[$field]) || empty($input[$field])) {
             echo json_encode([
@@ -22,15 +22,29 @@ try {
         }
     }
 
+    // Optional fields - provide defaults if not set
     $patientId = (int)$input['patient_id'];
-    $doctorId = (int)$input['doctor_id'];
-    $symptoms = $input['symptoms']; // Array of symptom IDs
-    $conditions = $input['conditions']; // Array of condition IDs
+    $doctorId = isset($input['doctor_id']) ? (int)$input['doctor_id'] : null; // Optional doctor ID
+    $symptoms = isset($input['symptoms']) ? $input['symptoms'] : [];
+    $conditions = isset($input['conditions']) ? $input['conditions'] : [];
     $diagnosis = trim($input['diagnosis']);
     $treatmentPlan = isset($input['treatment_plan']) ? trim($input['treatment_plan']) : '';
     $notes = isset($input['notes']) ? trim($input['notes']) : '';
     $followUpDate = isset($input['follow_up_date']) ? $input['follow_up_date'] : null;
     $status = isset($input['status']) ? trim($input['status']) : 'completed';
+
+    // Validate doctor exists if doctor_id is provided
+    if ($doctorId !== null) {
+        $doctorCheck = $pdo->prepare("SELECT id FROM staff WHERE id = ?");
+        $doctorCheck->execute([$doctorId]);
+        if (!$doctorCheck->fetch()) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Selected doctor not found'
+            ]);
+            exit;
+        }
+    }
 
     // Validate patient exists
     $patientCheck = $pdo->prepare("SELECT id FROM patients WHERE id = ?");
@@ -43,16 +57,6 @@ try {
         exit;
     }
 
-    // Validate doctor exists
-    $doctorCheck = $pdo->prepare("SELECT id FROM staff WHERE id = ? AND role = 'doctor'");
-    $doctorCheck->execute([$doctorId]);
-    if (!$doctorCheck->fetch()) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Doctor not found'
-        ]);
-        exit;
-    }
 
     // Validate symptoms exist
     if (!empty($symptoms)) {
@@ -96,7 +100,7 @@ try {
     ");
 
     $insertResult = $insertStmt->execute([
-        $patientId, $doctorId, $diagnosis, $treatmentPlan,
+        $patientId, $doctorId ?: null, $diagnosis, $treatmentPlan,
         $notes, $followUpDate, $status
     ]);
 
@@ -135,11 +139,11 @@ try {
     $consultationQuery = $pdo->prepare("
         SELECT
             c.*,
-            p.first_name as patient_first_name, p.last_name as patient_last_name,
-            s.first_name as doctor_first_name, s.last_name as doctor_last_name
+            CONCAT(p.first_name, ' ', p.last_name) as patient_name,
+            s.full_name as doctor_name, s.department as doctor_department
         FROM consultations c
         JOIN patients p ON c.patient_id = p.id
-        JOIN staff s ON c.doctor_id = s.id
+        LEFT JOIN staff s ON c.doctor_id = s.id
         WHERE c.id = ?
     ");
     $consultationQuery->execute([$consultationId]);
@@ -169,9 +173,9 @@ try {
         'consultation' => [
             'id' => $consultation['id'],
             'patient_id' => $consultation['patient_id'],
-            'patient_name' => $consultation['patient_first_name'] . ' ' . $consultation['patient_last_name'],
+            'patient_name' => $consultation['patient_name'],
             'doctor_id' => $consultation['doctor_id'],
-            'doctor_name' => $consultation['doctor_first_name'] . ' ' . $consultation['doctor_last_name'],
+            'doctor_name' => $consultation['doctor_name'] ? $consultation['doctor_name'] . ' - ' . $consultation['doctor_department'] : 'Not assigned',
             'consultation_date' => $consultation['consultation_date'],
             'diagnosis' => $consultation['diagnosis'],
             'treatment_plan' => $consultation['treatment_plan'],

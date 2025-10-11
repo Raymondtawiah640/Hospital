@@ -27,6 +27,7 @@ export class GeneralDepartment implements OnInit {
    address: '',
 
    // Consultation details
+   selectedDoctorId: '',
    chiefComplaint: '',
    historyOfPresentIllness: '',
    pastMedicalHistory: '',
@@ -66,6 +67,7 @@ export class GeneralDepartment implements OnInit {
  // API data
  patients: any[] = [];
  medicines: any[] = [];
+ doctors: any[] = [];
 
  // Only symptoms from API
  symptoms: any[] = [];
@@ -126,6 +128,7 @@ export class GeneralDepartment implements OnInit {
    this.loadPatients();
    this.loadMedicines();
    this.loadSymptoms();
+   this.loadDoctors();
 
    // Debug: Log initial diagnosis field state
    console.log('Initial diagnosis field state:', {
@@ -138,6 +141,15 @@ export class GeneralDepartment implements OnInit {
  getCurrentDoctorName(): string {
    // This would typically come from the auth service or user profile
    return 'Dr. General Physician';
+ }
+
+ // Get selected doctor name for display
+ getSelectedDoctorName(): string {
+   if (!this.consultationData.selectedDoctorId) {
+     return '';
+   }
+   const selectedDoctor = this.doctors.find(doctor => doctor.id == this.consultationData.selectedDoctorId);
+   return selectedDoctor ? `${selectedDoctor.full_name} - ${selectedDoctor.department}` : '';
  }
 
  // Get display value for fields (show "none" for empty fields)
@@ -217,7 +229,20 @@ export class GeneralDepartment implements OnInit {
    if (this.isLoggedIn) {
      const apiUrl = 'https://kilnenterprise.com/presbyterian-hospital/save-consultation.php';
 
-     this.http.post(apiUrl, this.consultationData)
+     // Map frontend field names to backend expected field names
+     const backendData = {
+       patient_id: parseInt(this.consultationData.patientId), // Convert to integer
+       doctor_id: this.consultationData.selectedDoctorId ? parseInt(this.consultationData.selectedDoctorId) : null, // Selected doctor or null
+       symptoms: [], // Will be empty for now - can be enhanced later
+       conditions: [], // Will be empty for now - can be enhanced later
+       diagnosis: this.consultationData.diagnosis || 'General Consultation',
+       treatment_plan: this.consultationData.treatmentPlan || 'As needed',
+       notes: `Chief Complaint: ${this.consultationData.chiefComplaint}\n\nHistory of Present Illness: ${this.consultationData.historyOfPresentIllness}\n\nPast Medical History: ${this.consultationData.pastMedicalHistory}\n\nCurrent Medications: ${this.consultationData.currentMedications}\n\nAllergies: ${this.consultationData.allergies}`,
+       follow_up_date: null,
+       status: 'completed'
+     };
+
+     this.http.post(apiUrl, backendData)
        .subscribe({
          next: (response: any) => {
            this.isLoading = false;
@@ -237,7 +262,11 @@ export class GeneralDepartment implements OnInit {
          error: (err) => {
            this.isLoading = false;
            console.error('Error saving consultation:', err);
-           this.errorMessage = 'There was a problem saving the consultation. Please try again later.';
+           if (err.error && err.error.message) {
+             this.errorMessage = err.error.message;
+           } else {
+             this.errorMessage = 'There was a problem saving the consultation. Please try again later.';
+           }
            setTimeout(() => {
              this.errorMessage = '';
            }, 5000);
@@ -258,6 +287,7 @@ export class GeneralDepartment implements OnInit {
      phone: '',
      email: '',
      address: '',
+     selectedDoctorId: '',
      chiefComplaint: '',
      historyOfPresentIllness: '',
      pastMedicalHistory: '',
@@ -447,6 +477,33 @@ export class GeneralDepartment implements OnInit {
      });
  }
 
+ // Load doctors from API
+ loadDoctors() {
+   console.log('Loading doctors from API...');
+   this.http.get('https://kilnenterprise.com/presbyterian-hospital/get-staff.php')
+     .subscribe({
+       next: (response: any) => {
+         console.log('Raw doctors API response:', response);
+
+         // Handle both array response and object response with staff property
+         if (Array.isArray(response)) {
+           this.doctors = response;
+         } else if (response && response.staff) {
+           this.doctors = response.staff;
+         } else {
+           this.doctors = [];
+         }
+
+         console.log('Processed doctors array:', this.doctors);
+         console.log('Total doctors loaded:', this.doctors.length);
+       },
+       error: (err) => {
+         console.error('Error loading doctors:', err);
+         this.doctors = [];
+       }
+     });
+ }
+
  // API-based Management for Symptoms and Conditions
  loadSymptoms() {
    this.loadingSymptoms = true;
@@ -527,8 +584,8 @@ export class GeneralDepartment implements OnInit {
 
  // Select patient from search results
  selectPatient(patient: any) {
-   // Map API fields to frontend fields
-   this.consultationData.patientId = patient.ghana_card_number || patient.id || '';
+   // Map API fields to frontend fields - use ID as patient_id, Ghana card as display
+   this.consultationData.patientId = patient.id.toString(); // Use numeric ID for backend
    this.consultationData.patientName = `${patient.first_name || ''} ${patient.last_name || ''}`.trim();
    this.consultationData.age = this.calculateAge(patient.date_of_birth) || '';
    this.consultationData.gender = patient.gender || '';

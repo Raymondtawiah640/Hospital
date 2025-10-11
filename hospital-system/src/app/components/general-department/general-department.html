@@ -23,6 +23,13 @@
    {{ errorMessage }}
  </div>
 
+ <!-- Validation Warning for Patient ID -->
+ <div *ngIf="!consultationData.patientId && (consultationData.patientName || consultationData.age || consultationData.gender)"
+      class="bg-amber-100 border border-amber-400 text-amber-700 px-4 py-3 rounded mb-4">
+   <i class="fas fa-exclamation-triangle mr-2"></i>
+   <strong>Patient ID is required.</strong> Please use the search button to find and select an existing patient, or ensure the Patient ID field is filled before saving.
+ </div>
+
 
  <form (ngSubmit)="submitConsultation()">
    <!-- Section 1: Patient Information -->
@@ -37,10 +44,11 @@
          <div class="flex gap-2">
            <input type="text" [(ngModel)]="consultationData.patientId" name="patientId" required
                   (input)="onFieldChange('patientId')"
+                  placeholder="Type Ghana Card Number (e.g., GHA-7306072119-3) or patient name..."
                   class="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
            <button type="button" (click)="showPatientSearch = !showPatientSearch"
                    class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 no-print">
-             Search
+             Search Patients
            </button>
          </div>
 
@@ -49,16 +57,38 @@
            {{ consultationData.patientId || 'Not specified' }}
          </div>
 
+         <!-- Patient Search Instructions -->
+         <div *ngIf="showPatientSearch && !consultationData.patientId" class="absolute z-10 mt-1 w-96 bg-blue-50 border border-blue-200 rounded-lg shadow-lg p-3 mb-2">
+           <div class="text-sm text-blue-800">
+             <i class="fas fa-info-circle mr-2"></i>
+             <strong>How to select a patient:</strong>
+             <ol class="list-decimal list-inside mt-2 space-y-1 text-xs">
+               <li>Type the patient's Ghana Card Number, name, or phone number in the Patient ID field above</li>
+               <li>Click on a patient from the search results below to auto-fill all fields</li>
+               <li>The Patient ID will be set to the Ghana Card Number</li>
+             </ol>
+           </div>
+         </div>
+
          <!-- Patient Search Results -->
          <div *ngIf="showPatientSearch" class="absolute z-10 mt-1 w-96 bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto">
            <div *ngFor="let patient of searchPatient(consultationData.patientId)" (click)="selectPatient(patient)"
                 class="p-3 hover:bg-gray-50 cursor-pointer border-b">
              <div class="font-semibold">{{ patient.first_name }} {{ patient.last_name }}</div>
-             <div class="text-sm text-gray-600">ID: {{ patient.ghana_card_number }} | Age: {{ calculateAge(patient.date_of_birth) }} | {{ patient.phone_number }}</div>
+             <div class="text-sm text-gray-600">
+               <strong>ID:</strong> {{ patient.ghana_card_number }} |
+               <strong>Age:</strong> {{ calculateAge(patient.date_of_birth) }} |
+               <strong>Phone:</strong> {{ patient.phone_number }}
+             </div>
            </div>
            <div *ngIf="searchPatient(consultationData.patientId).length === 0 && consultationData.patientId.length > 0"
                 class="p-3 text-gray-500">
-             No patients found
+             No patients found matching "{{ consultationData.patientId }}"
+           </div>
+           <div *ngIf="!consultationData.patientId"
+                class="p-3 text-amber-600 bg-amber-50 border border-amber-200">
+             <i class="fas fa-exclamation-triangle mr-2"></i>
+             Please type a Ghana Card Number, name, or phone number above to search for patients.
            </div>
          </div>
        </div>
@@ -146,6 +176,25 @@
    <!-- Section 2: Consultation Details -->
    <div class="space-y-6 mb-8 p-6 bg-green-50 rounded-lg border-l-4 border-green-400">
      <h3 class="text-xl font-semibold text-green-800 border-b pb-2">2. Consultation Details</h3>
+
+     <div>
+       <label class="block text-gray-700 font-semibold mb-2">
+         Consulting Doctor
+       </label>
+       <select [(ngModel)]="consultationData.selectedDoctorId" name="selectedDoctorId"
+               (change)="onFieldChange('selectedDoctorId')"
+               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+         <option value="">Select Doctor (Optional)</option>
+         <option *ngFor="let doctor of doctors" [value]="doctor.id">
+           {{ doctor.full_name }} - {{ doctor.department }}
+         </option>
+       </select>
+
+       <!-- Print version -->
+       <div class="print-only font-medium text-gray-900">
+         {{ getSelectedDoctorName() || 'Not assigned' }}
+       </div>
+     </div>
 
      <div>
        <label class="block text-gray-700 font-semibold mb-2">
@@ -521,12 +570,12 @@
              Reset Form
            </button>
          </div>
-         <button type="submit" [disabled]="isLoading || !isFormValid()"
-                 [class]="isLoading || !isFormValid() ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'"
+         <button type="submit" [disabled]="isLoading || !isFormValid() || !consultationData.patientId"
+                 [class]="isLoading || !isFormValid() || !consultationData.patientId ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'"
                  class="text-white px-6 py-2 rounded-lg transition duration-200">
            <span *ngIf="isLoading">Saving...</span>
-           <span *ngIf="!isLoading && isFormValid()">Save Consultation</span>
-           <span *ngIf="!isLoading && !isFormValid()">Complete Required Fields</span>
+           <span *ngIf="!isLoading && isFormValid() && consultationData.patientId">Save Consultation</span>
+           <span *ngIf="!isLoading && (!isFormValid() || !consultationData.patientId)">Complete Required Fields (Patient ID Required)</span>
          </button>
        </div>
      </div>
